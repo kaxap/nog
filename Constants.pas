@@ -74,6 +74,8 @@ const
 
   UI_SLIDER_MAX = 2000;
 
+  DS_ENGLISH_STREAM_NUM = 1;
+
 implementation
 
 end.
