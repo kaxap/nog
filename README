@@ -1,5 +1,5 @@
 Direct Show video player. Created for english learning purposes for russian speakers.
 Can translate words from subtitles using built-in Mueller's dictionary or Google/Bing.
 Derived from PlayWin demo (DSPack).
-Uses DSPack and DCEF (Henri Gourvest) http://progdigy.com
+Uses DSPack (2.3.3) and DCEF (r275) by Henri Gourvest http://progdigy.com
 Compiles on Borland Delphi 7.
