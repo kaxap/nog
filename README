@@ -1,1 +1,4 @@
-readme here
+Direct Show video player. Created for english learning purposes for russian speakers.
+Can translate words from subtitles using built-in Mueller's dictionary or Google.
+Derived from PlayWin demo (DSPack).
+Uses DSPack and DCEF (Henri Gourvest) http://progdigy.com
