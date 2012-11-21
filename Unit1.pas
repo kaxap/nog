@@ -336,7 +336,7 @@ begin
 
   ini := nil;
   try
-    ini := TIniFile.Create(FILENAME_SETTINGS);
+    ini := TIniFile.Create(sRootDir + FILENAME_SETTINGS);
 
     voice := '';
     for i := 0 to mnuSpeech.Count - 1 do
@@ -425,7 +425,7 @@ begin
   //load last selected TTS voice name
   savedVoiceName := '';
 
-  try ini := TIniFile.Create(FILENAME_SETTINGS);
+  try ini := TIniFile.Create(sRootDir + FILENAME_SETTINGS);
     savedVoiceName :=
       ini.ReadString(INI_VOICE_SECTION, INI_VOICE_NAME, '');
   finally
