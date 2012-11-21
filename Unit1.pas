@@ -831,6 +831,9 @@ begin
     try
       waysubs.Add('%s%s.srt');
       waysubs.Add('%s\subtitle\%s.srt');
+      waysubs.Add('%s\subtitles\%s.srt');
+      waysubs.Add('%s\english\%s.srt');
+      waysubs.Add('%s\eng\%s.srt');
       waysubs.Add('%s%s.eng.srt');
       waysubs.Add('%s%s.en.srt');
 
