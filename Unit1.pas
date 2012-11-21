@@ -1324,7 +1324,6 @@ begin
 
         Item.GroupIndex := 1;
         Item.RadioItem := True;
-        //qw
 
         if bFirst then
         begin
@@ -1337,7 +1336,7 @@ begin
         //disconnect all filters except first one
         if bDisconnectAfterFirst then
         begin
-          if i = 1 then
+          if i = DS_ENGLISH_STREAM_NUM then
           begin
             //check first one
             Item.Checked := True;
