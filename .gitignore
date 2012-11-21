@@ -40,6 +40,7 @@ Thumbs.db
 # Delphi backup and compiled files #
 *.~*
 *.dcu
+*.res
 
 # Project related #
 translated.txt
