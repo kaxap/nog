@@ -247,7 +247,11 @@ Very good, Lieutenant.
     try
       sub.id := StrToInt(Strings[u]);
     except
-      ShowMessage(Format('Error in subtitles: %d line', [u]));
+      //do not show subtitle error for line 0
+      //often occured with UTF-8 files which have special header
+      //TODO: process properly
+      if u <> 0 then
+        ShowMessage(Format('Error in subtitles: %d line', [u]));
       Inc(i);
       Continue;
     end;
@@ -352,7 +356,7 @@ begin
   try
     AEnd := ConvertStrTimeToMilliseconds(s, '::,');
   except
-    //there also can be subs coordinates after space character
+    //there also could be subs coordinates after space character
     //cut it
     s := Copy(s, 1, Pos(' ', s) - 1);
     AEnd := ConvertStrTimeToMilliseconds(s, '::,');
