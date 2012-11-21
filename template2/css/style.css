@@ -1,0 +1,91 @@
+
+/* This is just the basic styling for the whole page. */
+
+html {
+	font: 62.5%/1 "Lucida Sans Unicode","Lucida Grande",Verdana,Arial,Helvetica,sans-serif;
+	background-color: hsl(0,0%,16%);
+	background-size: 5px 5px;
+	background-image:	-webkit-linear-gradient( 45deg, hsla(0,0%,0%,0) 0px, hsla(0,0%,0%,.12) 50%, hsla(0,0%,0%,0) 100% );
+}
+
+body {
+	padding: 0px;
+	margin: 0 auto;
+	/*background-image: -webkit-linear-gradient( 0deg, 	hsla(0,0%,100%,0) 0px, 
+														hsla(0,0%,100%,.02) 50%, 
+														hsla(0,0%,100%,0) 100% );*/
+	
+}
+
+
+/* elements */
+
+ul {
+	margin-bottom: 50px;
+	font-size: 2em;
+}
+
+li {
+	padding: 50px 0;
+	text-align: center;
+}
+.tweet {
+	text-align: center;
+}
+
+
+
+
+/* article */
+
+article {
+	color: #4c4c4c;
+	text-shadow: hsla(0,0%,0%,.4) 0 1px;
+}
+
+article a {
+	text-decoration: none;
+	color: #326a88;
+}
+article a:hover {
+	color: #5893b1;
+}
+
+article p, article ul {
+	margin-bottom: 20px;
+}
+
+article h1 {
+	font-size: 6.5em;
+	font-weight: bold;
+	text-align: center;
+	margin-bottom: 10px;
+	
+	color: #000;
+	text-shadow: hsla(0,0%,100%,.05) 0 1px 0px;
+}
+article h1 .glow  {
+	color: #111d23;
+	-webkit-text-stroke: hsla(200,100%,50%,.2) 1px;
+	text-shadow: 	hsla(200,100%,50%,.6) 1px -1px 1px, 
+					hsla(200,100%,50%,.2) 0 -4px 8px, 
+					hsla(0,0%,0%,.5) 0 6px 8px;
+}
+article h2 {
+	font-size: 1.8em;
+	line-height: 1.3em;
+	text-align: center;
+	margin: 10px 0 40px 0;
+}
+article p {
+	font-size: 1.3em;
+	line-height: 1.4em;
+}
+article strong {
+	color: #7c7c7c;
+}
+article .meta {
+	font-size: 1.1em;
+}
+
+

@@ -1,0 +1,74 @@
+.word
+{
+    font-family: Helvetica;
+    font-size: 18px;
+    color: #ddd;
+    background: transparent;
+    cursor: pointer;
+    padding: 4px;
+    margin-left: 0px;
+    border-radius: 3px;
+}
+
+.word:hover
+{
+    background-color: #0e6583;
+}
+
+.selected
+{
+    background-color: #0c4563;
+}
+
+body
+{
+    background-color: #000;
+}
+
+#translation
+{
+    font-family: Helvetica;
+    color: #fff;
+    margin-left: 4px;
+    margin-top: 10px;
+}
+
+#main
+{
+    color: White;
+    height: 22px;
+}
+
+#logo
+{
+    width: 108px;
+    height: 40px;
+    background-image: url(../img/logo2.png);
+    cursor: pointer;
+}
+
+#translate_all
+{
+  width: 37px;
+  height: 21px;
+  padding: 0;
+  margin: 0;
+  margin-left: 3px;
+  margin-bottom: 3px;
+  background: url(../img/btn_all_w3.png) no-repeat 0 -21px;
+  display: inline-block;
+  vertical-align: middle;
+  cursor: pointer;
+}
+
+#translate_all:hover
+{
+  background-position: 0 -42px;
+}
+
+#translate_all:active
+{
+  background-position: 0 0;
+}
+
+

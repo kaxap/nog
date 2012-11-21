@@ -1,0 +1,30 @@
+<html>
+
+<head>
+<script type="text/javascript" src="js/jquery-1.5.2.min.js"></script>
+
+</head>
+<body>
+<a id="test" style="font-family: Helvetica;"> </a>
+
+<script>
+
+    $(document).ready(function () {
+
+        $.getJSON('http://translate.google.ru/translate_a/t?client=x&text=hello&sl=en&tl=ru',
+          function (data) {
+              $.each(data.dict, function (i, item) {
+                  if (item.pos == "") { item.pos = "----" }
+                  $("#test").append("<b>" + item.pos + "</b> <br />");
+                  $.each(item.terms, function (i, term) {
+                      $("#test").append(term + "<br />");
+                  })
+              })
+          });
+
+    });
+
+</script>
+
+</body>
+</html>

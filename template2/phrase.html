@@ -1,0 +1,211 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="content-type" content="application/xhtml+xml; charset=UTF-8" />
+    <title>U MENYA V KARMANE NOG</title>
+    <link rel="stylesheet" type="text/css" href="css/phrase.css" />
+    <script src="https://www.google.com/jsapi?key=ABQIAAAANYu3-fKH84XxkryxveK4IhQ7AUK8CJCKxUbQi595WAeCm3z9qBQF8pjOo9VNoKWz8q-ksyRRoexoSw"></script>
+    <script type="text/javascript" src="js/jquery-1.5.2.min.js"></script>
+</head>
+<body>
+    <table>
+        <tr>
+            <td rowspan="2">
+                <div id="logo" align="left">
+                </div>
+            </td>
+            <td>
+                <div id="main">
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <a id="translation">Нажимай @ переводи</a>
+            </td>
+        </tr>
+    </table>
+
+    <script>
+
+        $(document).ready(function () {
+            $('#logo').click(function () {
+                var phrase = getPhrase('.selected');
+                if (phrase == '') {
+                    phrase = getPhrase('.word');
+                    if (phrase == "")
+                        return;
+                }
+
+                alert('goto:http://google.com/#q=' + phrase);
+            });
+
+            addWord('hello');
+            addWord('world');
+            addWord('test');
+            addWord('now');
+            addWord('where');
+            addWord('is');
+            registerEvents();
+            alert('notification:phrase');
+        });
+
+        function clearWords() {
+            $('#main').html('');
+            $('#translation').text('Нажимай @ переводи');
+        }
+
+        function addWord(word) {
+            $('#main').append('<span class="word">' + word + '</span>');
+        }
+
+        function addTranslateAllButton() {
+            $('#main').append('<a id="translate_all"></a>');
+        }
+
+        function registerEvents() {
+            $('.word').toggle(function () {
+                $(this).addClass('selected');
+                refreshTranslation();
+                updateCorners(this);
+            }, function () {
+                $(this).removeClass('selected');
+                refreshTranslation();
+                updateCorners(this);
+            });
+            
+            $('#translate_all').click(function () {
+                $('#translation').text('...');
+                translateAll(); 
+            });
+        }
+
+        function roundLeftCorners(obj) {
+            $(obj).css('border-top-left-radius', '3px');
+            $(obj).css('border-bottom-left-radius', '3px');
+        }
+
+        function roundRightCorners(obj) {
+            $(obj).css('border-top-right-radius', '3px');
+            $(obj).css('border-bottom-right-radius', '3px');
+        }
+
+        function rectLeftCorners(obj) {
+            $(obj).css('border-top-left-radius', '0px');
+            $(obj).css('border-bottom-left-radius', '0px');
+        }
+
+        function rectRightCorners(obj) {
+            $(obj).css('border-top-right-radius', '0px');
+            $(obj).css('border-bottom-right-radius', '0px');
+        }
+
+        function updateCorners(obj) {
+            var a = $('.word');
+            var index = -1;
+            for (var i = 0; i < a.length; i++) {
+                if (a[i] == obj) {
+                    index = i;
+                    break;
+                }
+            }
+
+            var left = null;
+            var right = null;
+
+            if (a.first != obj) {
+                left = a[index - 1];
+            }
+
+            if (a.last != obj) {
+                right = a[index + 1];
+            }
+
+            if ($(obj).hasClass('selected')) {
+                if (left && $(left).hasClass('selected')) {
+                    rectRightCorners(left);
+                    rectLeftCorners(obj);
+                } else {
+                    roundLeftCorners(obj);
+                }
+
+                if (right && $(right).hasClass('selected')) {
+                    rectLeftCorners(right);
+                    rectRightCorners(obj);
+                } else {
+                    roundRightCorners(obj);
+                }
+
+            } else {
+                if (left) {
+                    roundRightCorners(left);
+                }
+
+                if (right) {
+                    roundLeftCorners(right);
+                }
+
+                roundLeftCorners(obj);
+                roundRightCorners(obj);
+
+            }
+
+
+
+        }
+
+        function getPhrase(selector) {
+            var a = $(selector);
+            var str = ''
+            for (var i = 0; i < a.length; i++) {
+                str += $(a[i]).text() + ' ';
+            }
+            return str;
+        }
+
+        function refreshTranslation() {
+            str = getPhrase('.selected');
+            getTranslation(str);
+
+            return false;
+        }
+ 
+        function translateAll() {
+            str = getPhrase('.word');
+            getTranslation(str);
+            
+            return false; 
+        }
+
+        function getTranslation(text) {
+            //$('#translation').text(text);
+
+            $.getJSON('http://translate.google.ru/translate_a/t?client=x&text=' + text + '&sl=en&tl=ru',
+              function (data) {
+
+                  obj = '#translation';
+                  trans = '';
+                  //no translation
+                  if (data.sentences == undefined) {
+                      $(obj).text('гугле в истерике');
+                      return;
+                  }
+
+                  //parse data
+                  if (data.sentences != undefined) {
+                      $.each(data.sentences, function (i, item) {
+                          trans += item.trans;
+                      });
+                      $(obj).text(trans);
+                  }
+
+
+              });
+        }
+
+
+
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,171 @@
+﻿<!DOCTYPE html>
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<head>
+	<link rel="stylesheet" type="text/css" href="./css/reset-min.css">
+	<link rel="stylesheet" type="text/css" href="./css/style.css">
+
+	<link rel="stylesheet" type="text/css" href="./css/radio.css">
+	<link rel="stylesheet" type="text/css" href="./css/checkbox.css">
+	<link rel="stylesheet" type="text/css" href="./css/range.css">
+	<link rel="stylesheet" type="text/css" href="./css/number.css">
+
+    <script type="text/javascript" src="js/jquery-1.5.2.min.js"></script>
+    <script type="text/javascript" src="js/jquery.mousewheel.js"></script>
+
+</head>
+<body>
+
+<table style="width:100%;">
+<tr>
+<td style="width:120px; padding:10px;">
+
+<input type="checkbox" data-icon1="ll" data-icon2="►" style="margin-top:0px; margin-right: 10px; padding:0; margin-bottom: 3px" />
+<span id="curpos" style="padding-left:5px;font-family: Helvetica; font-size: 10px; color: #aa5522;">0:00:00</span><span id="duration" style="font-family: Helvetica; font-size: 10px; color: #aaaaaa;padding-left:5px">(0:00:00)</span>
+
+</td>
+<td style="padding:0; padding-right: 10px;"><div style="height:0px; margin-top:0px; width:100%; cursor: e-resize;" id="slider-fix"></div>
+<input type="range" style="margin-top: 0px; width:100%" value="1" max="2000" id="slider"/></td>
+<td style="width:120px; padding: 10px;"><input id="volume" type="number" min="0" max="100" value="100" step="5" oninput="volumeOnInput(this);" /></td>
+</tr>
+</table>
+
+<!--
+<br /><br /><br />
+<a id="tt">123</a>
+-->
+
+<script>
+
+    //global vars
+    allowChangeSlidePos = true;
+    allowChangeVolume = true;
+
+    //generic
+    function volumeOnInput(obj) {
+        sendVolume(obj);
+    }
+
+    function sendVolume(obj) {
+        alert('event:volume(' + $(obj).val() + ')');
+    }
+
+    $('#volume').change(function () {
+        sendVolume(this);
+    });
+
+    //updaters
+    function setSliderPosition(pos) {
+        if (allowChangeSlidePos) {
+            $('#slider').val(pos);
+        }
+    }
+
+    function changeStatePlay() {
+        $(':checkbox').attr('checked', true);
+    }
+
+    function changeStatePause() {
+        $(':checkbox').attr('checked', false);
+    }
+
+    function setVolume(param) {
+        if (allowChangeVolume) {
+            $('#volume').val(param);
+        }
+    }
+
+    function setCurPos(param) {
+        if (allowChangeSlidePos) {
+            $('#curpos').text(param);
+        }
+    }
+
+    function setCurPos2(param) {
+        $('#curpos').text(param);
+    } 
+
+    function setDuration(param) {
+        $('#duration').text('(' + param + ')');
+    }
+
+    function moveSliderOnMouse(b) {
+
+        if (b.which != 1) { return false; }
+
+        allowChangeSlidePos = false;
+
+        var x = b.screenX - $(this).offset().left;
+        $('#slider').val(x / $(this).width() * 2000.0);
+    };
+
+    $(document).ready(function () {
+
+
+        //events
+        $(':checkbox').click(function () {
+            // http://www.electrictoolbox.com/check-uncheck-checkbox-jquery/
+            if ($(this).is(':checked')) {
+                alert('event:play()');
+            } else {
+                alert('event:pause()');
+            }
+        });
+
+        $('#slider').change(function () {
+            alert('event:sliderchange(' + $(this).val() + ')');
+        });
+
+        $('#slider').mouseup(function () {
+            //$('#tt').text($(this).val());
+
+            alert('event:seek(' + $(this).val() + ')');
+            allowChangeSlidePos = true;
+        });
+
+        $('#slider').mousedown(function () {
+            allowChangeSlidePos = false;
+        });
+
+        $('#slider-fix').mousemove(moveSliderOnMouse);
+        $('#slider-fix').mousedown(moveSliderOnMouse);
+        $('#slider-fix').mouseup(function () {
+            allowChangeSlidePos = true;
+            alert('event:seek(' + $('#slider').val() + ')');
+        });
+
+        $('#volume').mousedown(function () {
+            //allowChangeVolume = false;
+
+        });
+
+        $('#volume').mouseup(function () {
+            sendVolume(this);
+            $(this).blur();
+            //allowChangeVolume = true;
+        });
+
+        $('#volume').keypress(function () {
+            sendVolume(this);
+        });
+
+
+        $('#volume').mousewheel(function () {
+            sendVolume(this);
+        });
+
+        $('#volume').focus(function () {
+            allowChangeVolume = false;
+        });
+
+        $('#volume').blur(function () {
+            allowChangeVolume = true;
+        });
+
+        alert('notification:UI');
+    });
+
+
+</script>
+
+</body>
+</html>
