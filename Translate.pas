@@ -152,9 +152,9 @@ var
   function FindWord(w: String; bOnlyExact: Boolean = False;
      bSkipExact: Boolean = False): Integer;
   ///////////////////////////////////////
-  //рекурсивная процедура
-  //находит перевод для слова
-  //при этом исключает известные префиксы и постфиксы (окончания)
+  //recursive procedure
+  //excludes known prefixes and postfixes 
+  //and finds translation for a word
   ///////////////////////////////////////
 
   var
@@ -162,13 +162,13 @@ var
     s: String;
   begin
     Result := -1;
-    //увеличиваем глубину рекурсии
+    //increase recursion level
     Inc(ARecursionDeepness);
 
-    //максимально возможная глубина рекурсии: 3
+    //max recursion level = 3
     if ARecursionDeepness > 3 then
     begin
-      //если она превышена, то выходим
+      //exit if exceeded
       Dec(ARecursionDeepness);
       Exit;
     end;
@@ -176,7 +176,7 @@ var
 
     if NOT bSkipExact then
     begin
-      //пробуем найти точное соответствие
+      //try to find exact match
 
       i := FMuellerIndex.Find(w);
       if i >= 0 then
@@ -187,7 +187,7 @@ var
       end;
 
       {
-      //регистрочувствительный поиск по словарю
+      //case sensitive search
       for i := 0 to FMuellerDic.Count - 1 do
       begin
         //статьи в словаре разделены строкой, которая равна DIC_SEPARATOR
