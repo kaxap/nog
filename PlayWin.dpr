@@ -5,7 +5,6 @@ uses
   Forms,
   Unit1 in 'Unit1.pas' {frmMain},
   ColorControl in 'ColorControl.pas' {ColorControlForm},
-  DVobSubControls in 'DVobSubControls.pas',
   Misc in 'Misc.pas',
   Subtitles in 'Subtitles.pas',
   cef in 'chromium\cef.pas',
