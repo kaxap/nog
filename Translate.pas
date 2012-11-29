@@ -201,17 +201,17 @@ var
           end;
        end;
 
-      //регистроНЕчувствительный поиск
-      //переводим искомое слово в нижний регистр
+      //case insensetive search
+      //convert word to lower case
       w := AnsiLowerCase(w);
 
       for i := 0 to FMuellerDic.Count - 1 do
       begin
-        //статьи в словаре разделены строкой, которая равна DIC_SEPARATOR
+        //articles in the dictionary separated by DIC_SEPARATOR
         if FMuellerDic[i] = DIC_SEPARATOR then
           if w = LowerCase(FMuellerDic[i + 2]) then
           begin
-            //соответствие найдено, уменьшаем глубину рекурсии и выходим
+            //found the word, now decrease recursion level and exit
             Dec(ARecursionDeepness);
             Result := i;
             Exit;
@@ -225,39 +225,38 @@ var
 
     if bOnlyExact then
     begin
-      //перед выходом из процедуры - уменьшаем глубину рекурсии
+      //decrease recursion level before exit
       Dec(ARecursionDeepness);
       Exit;
     end;  
 
-    //точное совпадение не найдено
-    //попробуем пару трюков
+    //exact match not found
+    //lets try some tricks
 
-    //трюки с окончаниями
-    //перебираем все известные окончания
-    //по словарю постфиксов
+    //tricks with endings
+    //enumerate all known endings
+    //from postfix dictionary
     for i := 0 to FPostDic.Count - 1 do
     begin
-      //берем окончание слова и сравниваем с очередным из словаря постфиксов
+      //compare word's ending with next postfix from dictionary
       if Copy(w, Length(w) - Length(FPostDic[i]) + 1, Length(FPostDic[i])) = FPostDic[i] then
       begin
-        //если произошло совпадение по окончанию
-        //удаляем это окончание
+        //if matched then
+        //remove the ending
         s := Copy(w, 1, Length(w) - Length(FPostDic[i]));
 
-        //проверяем по правилу удвоения согласного после короткого гласного
-        //надо поставить до "+e", иначе gripping = grippe = грип, должно быть grip = сжатие
+        //check for double consonant after short vowel
         if i < 5 then
         begin
           if (Length(s) > 2) AND (s[Length(s)] = s[Length(s) - 1]) then
           begin
             s := Copy(s, 1, Length(s) - 1); //like bigger-big, beginner-begin etc.
-            //рекурсивно ищем новое слово
+            //search for new word recursively
             Result := FindWord(s);
-            //если нашли, то
+            //if found
             if Result >= 0 then
             begin
-              //уменьшаем глубину рекурсии и выходим
+              //decrease recursion level and exit
               Dec(ARecursionDeepness);
               Exit;
             end;
@@ -265,12 +264,12 @@ var
           end;
         end;
 
-        //проверяем по чистому совпадению, без проверки корней
+        //check for clean match without any manipulation with postfixes
         Result := FindWord(s, true);  //clean matching, like goods-good, playing-play etc.
-        //если нашли, то
+        //if found
         if Result >= 0 then
         begin
-          //уменьшаем глубину рекурсии и выходим
+          //decrease recursion level and exit
           Dec(ARecursionDeepness);
           Exit;
         end;
