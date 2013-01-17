@@ -2502,8 +2502,6 @@ end;
 function TfrmMain.SwitchSubtitlesVisibility: Boolean;
 var
   vob: IDirectVobSub;
-  subs_hidden: BOOL;
-  i: Integer;
 begin
   Result := False;
   vob := GetVobSubFilter;
