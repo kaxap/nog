@@ -9,7 +9,7 @@ uses
   Dialogs, DSPack, DirectShow9, StdCtrls, ActiveX, DSUtil, Menus,
   ExtCtrls, ComCtrls, Buttons, ImgList, Subtitles, ComObj, Misc, cef, ceflib,
   Dictionaries, shellapi, OleServer, SpeechLib_TLB, XPMan, ShellCtrls,
-  Inifiles, jpeg, AppEvnts, Constants;
+  Inifiles, jpeg, AppEvnts, Constants, DirectVobSub;
 
 type
   pPlayListItem = ^TPlayListItem;
@@ -206,6 +206,7 @@ type
     procedure HidePhraseInBottom;
     procedure SwitchToStream(const activeStreamName: String;
       bRestartEverything: Boolean = True);
+    function GetVobSubFilter: IDirectVobSub;
   public
     { Public declarations }
     OsdChanged : Boolean;
@@ -242,7 +243,7 @@ var
 implementation
 
 uses ColorControl, JS_HTML_Code, CefExtension_Translate,
-  Translate, StrUtils, DirectVobSub, Unit2;
+  Translate, StrUtils, Unit2;
 
 {$R *.dfm}
 
@@ -1964,25 +1965,13 @@ var
 begin
   Result := False;
   try
-    if SUCCEEDED(FilterGraph1.QueryInterface(IID_IGraphBuilder, builder)) then
-    begin
-      filter := FindFilter(builder, CLSID_DVobSubAutoLoadingVersion);
-      if filter <> nil then
-      begin
-        if SUCCEEDED(filter.QueryInterface(IID_IDirectVobSub, vob)) then
-        begin
-          vob.put_SubtitleTiming(delay, FSubSpeedMul, FSubSpeedDiv);
-        end;
-      end;
-    end;
+    vob := GetVobSubFilter;
+    vob.put_SubtitleTiming(delay, FSubSpeedMul, FSubSpeedDiv);
   finally
     FSubDelay := delay;
     CheckSubs();
     Result := True;
   end;
-
-
-
 end;
 
 function TfrmMain.ShowWordTranslationByNum(num: Integer): Boolean;
@@ -2460,6 +2449,29 @@ begin
     FIMediaSeek := MediaSeeking;
   end;
 
+end;
+
+function TfrmMain.GetVobSubFilter: IDirectVobSub;
+var
+  vob: IDirectVobSub;
+  filter: IBaseFilter;
+  builder: IGraphBuilder;
+begin
+  Result := nil;
+  try
+    if SUCCEEDED(FilterGraph1.QueryInterface(IID_IGraphBuilder, builder)) then
+    begin
+      filter := FindFilter(builder, CLSID_DVobSubAutoLoadingVersion);
+      if filter <> nil then
+      begin
+        if SUCCEEDED(filter.QueryInterface(IID_IDirectVobSub, vob)) then
+        begin
+          Result := vob;
+        end;
+      end;
+    end;
+  finally
+  end;
 end;
 
 end.
