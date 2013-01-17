@@ -188,6 +188,7 @@ type
     FPrevWindowWidth: Integer;
     FPrevWindowHeight: Integer;
     FEnchancedFullScreen: Boolean;
+    FSubtitlesHidden: Boolean;
     procedure AddAudioStreamsToMenu(bDisconnectAfterFirst: Boolean = False);
     procedure mnuAudioStreamClick(Sender: TObject);
     procedure CMDialogKey(var Msg: TWMKey); message CM_DIALOGKEY;
@@ -1731,6 +1732,11 @@ begin
         SetSubDelay(FSubDelay - 1000);
       end;
 
+    VK_DECIMAL:
+      begin
+        SwitchSubtitlesVisibility();
+      end;
+
     Ord('0')..Ord('9'): ShowWordTranslationByNum(code - Ord('0'));  //open words by pressing 0-9 keyboard buttons
   else
     Result := False;
@@ -2485,7 +2491,8 @@ begin
   if vob <> nil then
   begin
     try
-      vob.put_HideSubtitles(NOT Show);
+      FSubtitlesHidden := NOT Show;
+      vob.put_HideSubtitles(FSubtitlesHidden);
       Result := True;
     except
     end;
@@ -2495,18 +2502,17 @@ end;
 function TfrmMain.SwitchSubtitlesVisibility: Boolean;
 var
   vob: IDirectVobSub;
-  subs_hidden: LongBool;
+  subs_hidden: BOOL;
+  i: Integer;
 begin
   Result := False;
   vob := GetVobSubFilter;
   if vob <> nil then
   begin
     try
-      if SUCCEEDED(vob.get_HideSubtitles(subs_hidden)) then
-      begin
-        vob.put_HideSubtitles(NOT subs_hidden);
-        Result := True;
-      end;
+      FSubtitlesHidden := NOT FSubtitlesHidden;
+      vob.put_HideSubtitles(FSubtitlesHidden);
+      Result := True;
     except
     end;
   end;
