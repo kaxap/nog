@@ -233,6 +233,8 @@ type
     procedure UpdateUIControls;
     procedure CheckCommandlineArguments;
     procedure SwitchEnhancedFullScreen;
+    function ShowSubtitles(const show: Boolean): Boolean;
+    function SwitchSubtitlesVisibility: Boolean;
   end;
 
 var
@@ -2471,6 +2473,42 @@ begin
       end;
     end;
   finally
+  end;
+end;
+
+function TfrmMain.ShowSubtitles(const show: Boolean): Boolean;
+var
+  vob: IDirectVobSub;
+begin
+  Result := False;
+  vob := GetVobSubFilter;
+  if vob <> nil then
+  begin
+    try
+      vob.put_HideSubtitles(NOT Show);
+      Result := True;
+    except
+    end;
+  end;
+end;
+
+function TfrmMain.SwitchSubtitlesVisibility: Boolean;
+var
+  vob: IDirectVobSub;
+  subs_hidden: LongBool;
+begin
+  Result := False;
+  vob := GetVobSubFilter;
+  if vob <> nil then
+  begin
+    try
+      if SUCCEEDED(vob.get_HideSubtitles(subs_hidden)) then
+      begin
+        vob.put_HideSubtitles(NOT subs_hidden);
+        Result := True;
+      end;
+    except
+    end;
   end;
 end;
 
