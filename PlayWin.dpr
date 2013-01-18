@@ -18,15 +18,21 @@ uses
   Transparency in 'Transparency.pas',
   IntegerList in 'IntegerList.pas',
   SubtitlesAnalyzer in 'SubtitlesAnalyzer.pas',
-  Unit2 in '..\image_mirr_multirator\Unit2.pas' {Form2};
+  Unit2 in '..\image_mirr_multirator\Unit2.pas' {Form2},
+  uMsgReceiver in 'uMsgReceiver.pas' {frmMsgReceiver},
+  uStartup in 'uStartup.pas';
 
 {$R *.res}
 
 begin
   SetThreadLocale(1049);
+
+  
+
   Application.Initialize;
   Application.CreateForm(TfrmMain, frmMain);
   Application.CreateForm(TColorControlForm, ColorControlForm);
   Application.CreateForm(TForm2, Form2);
+  Application.CreateForm(TfrmMsgReceiver, frmMsgReceiver);
   Application.Run;
 end.
