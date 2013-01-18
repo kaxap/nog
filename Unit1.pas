@@ -236,6 +236,7 @@ type
     procedure SwitchEnhancedFullScreen;
     function ShowSubtitles(const show: Boolean): Boolean;
     function SwitchSubtitlesVisibility: Boolean;
+    function OpenFileUI(filenames: TStrings): Boolean;
   end;
 
 var
@@ -255,9 +256,34 @@ procedure SetHook(hCaller, hParent: HWND); stdcall; external 'Hook.dll';
 procedure ReleaseHook; external 'Hook.dll';
 {$ENDIF}
 
-procedure TfrmMain.mnuOpenFileClick(Sender: TObject);
+function TfrmMain.OpenFileUI(filenames: TStrings): Boolean;
 var
   i : Integer;
+begin
+  lbFiles.Items.Clear;
+  lbFiles.Sorted := True;
+  // Now go thru every files selected in the opendialog and add
+  // them one by one to the Players playlist.
+  // The first file added to the players playlist will loaded
+  // automaticly
+  for i := filenames.Count - 1 downto 0 do
+  begin
+    New(PlayListItem);
+    PlayListItem^.Filename := ExtractFilename(filenames[i]);
+    PlayListItem^.Path := ExtractFilePath(filenames[i]);
+    lbFiles.Items.AddObject(PlayListItem^.Filename, TObject(PlayListItem));
+  end;
+
+  Caption := FFormCaption + ' - ' + PlayListItem^.Filename;
+
+  lbFiles.ItemIndex := 0;
+  PlayFile(filenames[0]);
+  PlayingIndex := 0;
+end;
+
+procedure TfrmMain.mnuOpenFileClick(Sender: TObject);
+var
+  i: Integer;
 begin
   if NOT FCanOpenFile then
     Exit;
@@ -283,30 +309,11 @@ begin
 
     FCanOpenFile := True;
 
-    lbFiles.Items.Clear;
-    lbFiles.Sorted := True;
-    with OpenDialog1.Files do
-      // Now go thru every files selected in the opendialog and add
-      // them one by one to the Players playlist.
-      // The first file added to the players playlist will loaded
-      // automaticly
-      for I := Count - 1 downto 0 do
-      begin
-        New(PlayListItem);
-        PlayListItem^.Filename := ExtractFilename(Strings[I]);
-        PlayListItem^.Path := ExtractFilePath(Strings[I]);
-        lbFiles.Items.AddObject(PlayListItem^.Filename, TObject(PlayListItem));
-      end;
-
-      Caption := FFormCaption + ' - ' + PlayListItem^.Filename;
-
-    lbFiles.ItemIndex := 0;
-    PlayFile(OpenDialog1.Files.Strings[0]);
-    PlayingIndex := 0;
+    OpenFileUI(OpenDialog1.Files);
   end else
     FCanOpenFile := True;
 
-  
+
   if PlayingIndex < lbFiles.Items.Count -1 then
     sbNext.Enabled := True;
 
@@ -2217,29 +2224,23 @@ end;
 procedure TfrmMain.CheckCommandlineArguments;
 var
   filename: String;
+  filenames: TStringList;
 begin
   if FCommandlineChecked then
     Exit;
   filename := ParamStr(1);
 
-  try
-    if (filename <> '') AND (FileExists(filename)) then
-    begin
-      PlayFile(filename);
-      Caption := FFormCaption + ' - ' + filename;
-
-      //add item to list
-      //necessary to change audiostreams
-      //TODO: duplicate code from openfile dialog, fix it
-      New(PlayListItem);
-      PlayListItem^.Filename := ExtractFileName(filename);
-      PlayListItem^.Path := ExtractFilePath(filename);
-      lbFiles.Items.AddObject(PlayListItem^.Filename, TObject(PlayListItem));
-      OpenDialog1.FileName := filename;
+  if (filename <> '') AND (FileExists(filename)) then
+  begin
+    try
+      filenames := TStringList.Create;
+      filenames.Add(filename);
+      OpenFileUI(filenames);
+    finally
+      filenames.Free;
+      FCommandlineChecked := True;
     end;
-  finally
-    FCommandlineChecked := True;
-  end;  
+  end;
 end;
 
 procedure TfrmMain.tmrCheckCommandlineTimer(Sender: TObject);
