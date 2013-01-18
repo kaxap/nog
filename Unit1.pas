@@ -12,7 +12,7 @@ uses
   Inifiles, jpeg, AppEvnts, Constants, DirectVobSub;
 
 type
-  pPlayListItem = ^TPlayListItem;
+  PPlayListItem = ^TPlayListItem;
   TPlayListItem = record
     Filename : String;
     Path : String;
@@ -210,9 +210,9 @@ type
     function GetVobSubFilter: IDirectVobSub;
   public
     { Public declarations }
-    OsdChanged : Boolean;
-    PlayListItem : pPlayListItem;
-    PlayingIndex : Integer;
+    FOsdChanged : Boolean;
+    FPlayListItem : PPlayListItem;
+    FPlayingIndex : Integer;
     FSubtitles: TSrtSubtitles;
     FBrowser: ICefBrowser;
     FPhraseBrowser: ICefBrowser;
@@ -268,17 +268,17 @@ begin
   // automaticly
   for i := filenames.Count - 1 downto 0 do
   begin
-    New(PlayListItem);
-    PlayListItem^.Filename := ExtractFilename(filenames[i]);
-    PlayListItem^.Path := ExtractFilePath(filenames[i]);
-    lbFiles.Items.AddObject(PlayListItem^.Filename, TObject(PlayListItem));
+    New(FPlayListItem);
+    FPlayListItem^.Filename := ExtractFilename(filenames[i]);
+    FPlayListItem^.Path := ExtractFilePath(filenames[i]);
+    lbFiles.Items.AddObject(FPlayListItem^.Filename, TObject(FPlayListItem));
   end;
 
-  Caption := FFormCaption + ' - ' + PlayListItem^.Filename;
+  Caption := FFormCaption + ' - ' + FPlayListItem^.Filename;
 
   lbFiles.ItemIndex := 0;
   PlayFile(filenames[0]);
-  PlayingIndex := 0;
+  FPlayingIndex := 0;
 end;
 
 procedure TfrmMain.mnuOpenFileClick(Sender: TObject);
@@ -314,7 +314,7 @@ begin
     FCanOpenFile := True;
 
 
-  if PlayingIndex < lbFiles.Items.Count -1 then
+  if FPlayingIndex < lbFiles.Items.Count -1 then
     sbNext.Enabled := True;
 
 
@@ -651,10 +651,10 @@ begin
   end;
 
   // osd changed (sound volume)
-  if OsdChanged then
+  if FOsdChanged then
   begin
     DSVideoWindowEx1.ClearBack;
-    OsdChanged := False;
+    FOsdChanged := False;
   end;
   
 end;
@@ -694,7 +694,7 @@ begin
   tmp.Free;
 
   //set osd changed flag
-  OsdChanged := True;
+  FOsdChanged := True;
 end;
 
 procedure TfrmMain.CheckColorControlSupport;
@@ -738,17 +738,17 @@ begin
       // automaticly
       for I := Count - 1 downto 0 do
       begin
-        New(PlayListItem);
-        PlayListItem^.Filename := ExtractFilename(Strings[I]);
-        PlayListItem^.Path := ExtractFilePath(Strings[I]);
-        lbFiles.Items.AddObject(PlayListItem^.Filename, TObject(PlayListItem));
+        New(FPlayListItem);
+        FPlayListItem^.Filename := ExtractFilename(Strings[I]);
+        FPlayListItem^.Path := ExtractFilePath(Strings[I]);
+        lbFiles.Items.AddObject(FPlayListItem^.Filename, TObject(FPlayListItem));
       end;
   end;
 
   //check availability of prev/next buttons
-  if PlayingIndex > 0 then
+  if FPlayingIndex > 0 then
     sbPrev.Enabled := True;
-  if PlayingIndex < lbFiles.Items.Count -1 then
+  if FPlayingIndex < lbFiles.Items.Count -1 then
     sbNext.Enabled := True;
 end;
 
@@ -759,27 +759,27 @@ begin
   //play file on dbl click on list
 
   //exit if already playing
-  if lbFiles.ItemIndex = PlayingIndex then Exit;
+  if lbFiles.ItemIndex = FPlayingIndex then Exit;
 
   //get path and filename
-  PlayListItem := pPlayListitem(lbFiles.Items.Objects[lbFiles.Itemindex]);
-  Filename := PlayListItem^.Path;
+  FPlayListItem := PPlayListItem(lbFiles.Items.Objects[lbFiles.Itemindex]);
+  Filename := FPlayListItem^.Path;
 
   if Filename[Length(Filename)] <> '\' then
     Filename := Filename + '\';
     
-  Filename := Filename + PlayListItem^.Filename;
+  Filename := Filename + FPlayListItem^.Filename;
 
   //play file
   PlayFile(Filename);
-  PlayingIndex := lbFiles.Itemindex;
+  FPlayingIndex := lbFiles.Itemindex;
 
   //set availability of prev/next buttons
-  if PlayingIndex > 0 then
+  if FPlayingIndex > 0 then
     sbPrev.Enabled := True
   else
     sbPrev.Enabled := False;
-  if PlayingIndex < lbFiles.Items.Count -1 then
+  if FPlayingIndex < lbFiles.Items.Count -1 then
     sbNext.Enabled := True
   else
     sbNext.Enabled := False;
@@ -892,28 +892,28 @@ var
   Filename : String;
 begin
   //play next file if available
-  if Playingindex < lbFiles.Items.Count -1 then
+  if FPlayingIndex < lbFiles.Items.Count -1 then
   begin
     //get filename and path
     lbFiles.ItemIndex := lbFiles.ItemIndex +1;
-    PlayListItem := pPlayListItem(lbFiles.Items.Objects[lbFiles.ItemIndex]);
-    Filename := PlayListItem^.Path;
+    FPlayListItem := PPlayListItem(lbFiles.Items.Objects[lbFiles.ItemIndex]);
+    Filename := FPlayListItem^.Path;
     if Filename[Length(Filename)] <> '\' then
       Filename := Filename + '\';
-    Filename := Filename + PlayListItem^.Filename;
+    Filename := Filename + FPlayListItem^.Filename;
 
     //play it
     PlayFile(Filename);
-    PlayingIndex := lbFiles.Itemindex;
+    FPlayingIndex := lbFiles.Itemindex;
   end;
 
   //set prev/next buttons availablity
   //TODO: rafactor in one proc/func all these shitty repeating pieces
-  if PlayingIndex > 0 then
+  if FPlayingIndex > 0 then
     sbPrev.Enabled := True
   else
     sbPrev.Enabled := False;
-  if PlayingIndex < lbFiles.Items.Count -1 then
+  if FPlayingIndex < lbFiles.Items.Count -1 then
     sbNext.Enabled := True
   else
     sbNext.Enabled := False;
@@ -958,28 +958,28 @@ procedure TfrmMain.sbNextClick(Sender: TObject);
 var
   Filename : String;
 begin
-  if Playingindex < lbFiles.Items.Count -1 then
+  if FPlayingIndex < lbFiles.Items.Count -1 then
   begin
     //TODO: refactor all this repeating code into one proc/func
     //get filename and path
     lbFiles.ItemIndex := lbFiles.ItemIndex +1;
-    PlayListItem := pPlayListItem(lbFiles.Items.Objects[lbFiles.ItemIndex]);
-    Filename := PlayListItem^.Path;
+    FPlayListItem := PPlayListItem(lbFiles.Items.Objects[lbFiles.ItemIndex]);
+    Filename := FPlayListItem^.Path;
     if Filename[Length(Filename)] <> '\' then
       Filename := Filename + '\';
-    Filename := Filename + PlayListItem^.Filename;
+    Filename := Filename + FPlayListItem^.Filename;
 
     //play it
     PlayFile(Filename);
-    PlayingIndex := lbFiles.Itemindex;
+    FPlayingIndex := lbFiles.Itemindex;
   end;
 
   //check availability of prev/next buttons
-  if PlayingIndex > 0 then
+  if FPlayingIndex > 0 then
     sbPrev.Enabled := True
   else
     sbPrev.Enabled := False;
-  if PlayingIndex < lbFiles.Items.Count -1 then
+  if FPlayingIndex < lbFiles.Items.Count -1 then
     sbNext.Enabled := True
   else
     sbNext.Enabled := False;
@@ -990,22 +990,22 @@ var
   Filename : String;
 begin
   //omg not again. See sbNextClick func comments
-  if Playingindex > 0 then
+  if FPlayingIndex > 0 then
   begin
     lbFiles.ItemIndex := lbFiles.ItemIndex -1;
-    PlayListItem := pPlayListItem(lbFiles.Items.Objects[lbFiles.ItemIndex]);
-    Filename := PlayListItem^.Path;
+    FPlayListItem := PPlayListItem(lbFiles.Items.Objects[lbFiles.ItemIndex]);
+    Filename := FPlayListItem^.Path;
     if Filename[Length(Filename)] <> '\' then
       Filename := Filename + '\';
-    Filename := Filename + PlayListItem^.Filename;
+    Filename := Filename + FPlayListItem^.Filename;
     PlayFile(Filename);
-    PlayingIndex := lbFiles.Itemindex;
+    FPlayingIndex := lbFiles.Itemindex;
   end;
-  if PlayingIndex > 0 then
+  if FPlayingIndex > 0 then
     sbPrev.Enabled := True
   else
     sbPrev.Enabled := False;
-  if PlayingIndex < lbFiles.Items.Count -1 then
+  if FPlayingIndex < lbFiles.Items.Count -1 then
     sbNext.Enabled := True
   else
     sbNext.Enabled := False;
@@ -1014,7 +1014,7 @@ end;
 procedure TfrmMain.mnuClearFilesClick(Sender: TObject);
 begin
   //clear files
-  //BUG: should we free pPlayListItem(s) from lbFiles first? O_o
+  //BUG: should we free pFPlayListItem(s) from lbFiles first? O_o
   FilterGraph1.Stop;
   FilterGraph1.ClearGraph;
   FilterGraph1.Active := False;
@@ -2389,10 +2389,10 @@ begin
     FilterGraph1.Active := True;
 
     //get filename and path
-    Filename := PlayListItem^.Path;
+    Filename := FPlayListItem^.Path;
     if Filename[Length(Filename)] <> '\' then
       Filename := Filename + '\';
-    Filename := Filename + PlayListItem^.Filename;
+    Filename := Filename + FPlayListItem^.Filename;
     FilterGraph1.RenderFile(Filename);
   end;
 
