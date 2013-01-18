@@ -1406,7 +1406,7 @@ procedure TfrmMain.chromiumMuellerJsAlert(Sender: TCustomChromium;
 var
   pref: String;
   body: String;
-  param: string;
+  param: String;
   i: Integer;
   dur, cur: Int64;
 begin
