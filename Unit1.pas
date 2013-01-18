@@ -127,7 +127,6 @@ type
     procedure DSVideoWindowEx1OverlayVisible(Sender: TObject;
       Visible: Boolean);
     procedure mnuVobsubsClick(Sender: TObject);
-    procedure test1Click(Sender: TObject);
     procedure chromiumMuellerJsAlert(Sender: TCustomChromium;
       const browser: ICefBrowser; const frame: ICefFrame;
       const message: ustring; out Result: Boolean);
@@ -247,7 +246,7 @@ var
 implementation
 
 uses ColorControl, JS_HTML_Code, CefExtension_Translate,
-  Translate, StrUtils, Unit2;
+  Translate, StrUtils;
 
 {$R *.dfm}
 
@@ -1400,22 +1399,6 @@ begin
   SwitchToStream(activeStreamName);
 
 end;
-
-
-procedure TfrmMain.test1Click(Sender: TObject);
-{var
-  t: TCefTranslateExtension;}
-
-begin
-  //FBrowser.GetMainFrame.ExecuteJavaScript('appendWord("test", "green"); registerEvents();', '', 0);
-  //t := TCefTranslateExtension.Create;
-  //t.FindTranslation('incredibly');
-  //t.Free;
-  //FBrowser.GetMainFrame.ExecuteJavaScript('dsetPage("hello, my friend");', '', 0);
-  //FBrowser.GetMainFrame.loadUrl('http://demo.tutorialzine.com/2009/12/colorful-content-accordion-css-jquery/demo.html');
-  Form2.Show;
-end;
-
 
 procedure TfrmMain.chromiumMuellerJsAlert(Sender: TCustomChromium;
   const browser: ICefBrowser; const frame: ICefFrame;

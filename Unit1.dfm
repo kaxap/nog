@@ -1971,7 +1971,6 @@ object frmMain: TfrmMain
       Caption = 'Debug'
       object test1: TMenuItem
         Caption = 'command1'
-        OnClick = test1Click
       end
       object command21: TMenuItem
         Caption = 'command2'
