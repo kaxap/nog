@@ -190,7 +190,7 @@ type
     FPrevWindowTop: Integer;
     FPrevWindowWidth: Integer;
     FPrevWindowHeight: Integer;
-    FEnchancedFullScreen: Boolean;
+    FEnhancedFullScreen: Boolean;
     FSubtitlesHidden: Boolean;
     FDisplayControl: IMFVideoDisplayControl;
     FEVR: IBaseFilter;
@@ -434,7 +434,7 @@ begin
   FMainBrowserLoaded := False;
   FCanOpenFile := True;
   FCommandlineChecked := False;
-  FEnchancedFullScreen := False;
+  FEnhancedFullScreen := False;
   FCanUpdateVideoSize := True;
 
   FPhraseTranslated := False;
@@ -2268,7 +2268,7 @@ begin
   //stop updating video size
   FCanUpdateVideoSize := False;
 
-  if NOT FEnchancedFullScreen then
+  if NOT FEnhancedFullScreen then
   begin
     //enter fullscreen mode by hiding window menu and border
 
@@ -2293,7 +2293,7 @@ begin
       Monitor.Left, Monitor.Top, Monitor.Width, Monitor.Height,
       SWP_SHOWWINDOW);
 
-    FEnchancedFullScreen := True;
+    FEnhancedFullScreen := True;
   end else
   begin
     //show elements in right order
@@ -2315,7 +2315,7 @@ begin
       FPrevWindowWidth, FPrevWindowHeight,
       SWP_SHOWWINDOW);
 
-    FEnchancedFullScreen := False;
+    FEnhancedFullScreen := False;
   end;
 
   FCanUpdateVideoSize := True;
