@@ -94,6 +94,7 @@ type
     imgLoading: TImage;
     chromiumPhrase: TChromium;
     chromiumMueller: TChromium;
+    tmrHideCursor: TTimer;
     procedure mnuOpenFileClick(Sender: TObject);
     procedure mnuExitClick(Sender: TObject);
     procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
@@ -174,6 +175,8 @@ type
     procedure mnuOpenNextClick(Sender: TObject);
     procedure File1Click(Sender: TObject);
     procedure DSVideoWindowEx1Resize(Sender: TObject);
+    procedure DSVideoWindowEx1Exit(Sender: TObject);
+    procedure tmrHideCursorTimer(Sender: TObject);
   private
     { Private declarations }
     FSubDelay: Integer;
@@ -246,6 +249,8 @@ type
     function SwitchSubtitlesVisibility: Boolean;
     function OpenFileUI(filenames: TStrings): Boolean;
     procedure OpenNextFile;
+    procedure ShowCursorOnVideo;
+    procedure HideCursorOnVideo;
   end;
 
 var
@@ -2040,11 +2045,15 @@ end;
 procedure TfrmMain.DSVideoWindowEx1MouseMove(Sender: TObject;
   Shift: TShiftState; X, Y: Integer);
 begin
+  ShowCursorOnVideo;
+  tmrHideCursor.Enabled := False;
+  tmrHideCursor.Enabled := True;
+
   if (FPhraseSubtitle = '') then
     Exit;
 
   if (FilterGraph1.State = gsPaused) then
-    Exit;  
+    Exit;
 
   try
     if (y > DSVideoWindowEx1.Height - chromiumPhrase.Height) then
@@ -2053,6 +2062,8 @@ begin
       HidePhraseInBottom;
   except
   end;
+
+  
 
 end;
 
@@ -2606,6 +2617,26 @@ begin
 
   UpdateVideoSize;
   FDisplayControl.SetAspectRatioMode(MFVideoARMode_PreservePicture);
+end;
+
+procedure TfrmMain.DSVideoWindowEx1Exit(Sender: TObject);
+begin
+  tmrHideCursor.Enabled := False;
+end;
+
+procedure TfrmMain.HideCursorOnVideo;
+begin
+  DSVideoWindowEx1.Cursor := crNone;
+end;
+
+procedure TfrmMain.ShowCursorOnVideo;
+begin
+  DSVideoWindowEx1.Cursor := crHandPoint;
+end;
+
+procedure TfrmMain.tmrHideCursorTimer(Sender: TObject);
+begin
+  HideCursorOnVideo;
 end;
 
 end.

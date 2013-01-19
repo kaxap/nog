@@ -334,6 +334,7 @@ object frmMain: TfrmMain
     TabOrder = 6
     OnClick = DSVideoWindowEx1Click
     OnDblClick = DSVideoWindowEx1DblClick
+    OnExit = DSVideoWindowEx1Exit
     OnMouseMove = DSVideoWindowEx1MouseMove
     OnMouseUp = DSVideoWindowEx1MouseUp
     OnResize = DSVideoWindowEx1Resize
@@ -3824,5 +3825,12 @@ object frmMain: TfrmMain
     OnTimer = tmrCheckCommandlineTimer
     Left = 312
     Top = 16
+  end
+  object tmrHideCursor: TTimer
+    Enabled = False
+    Interval = 2000
+    OnTimer = tmrHideCursorTimer
+    Left = 312
+    Top = 64
   end
 end
