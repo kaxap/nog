@@ -43,7 +43,126 @@ interface
 
 implementation
 
-uses Constants;
+uses Constants, Math;
+
+function GetFirstDigits(const s: String): String;
+var
+  i: Integer;
+begin
+  Result := '';
+  for i := 1 to Length(s) do
+  begin
+    if (s[i] in ['0'..'9']) then
+      Result := Result + s[i]
+    else
+      Exit;
+  end;
+end;
+
+function CompareStringsRespectToFirstDigits(List: TStringList;
+   Index1, Index2: Integer): Integer;
+var
+  s1, s2: String;
+  d1, d2: String;
+begin
+  s1 := List[Index1];
+  s2 := List[Index2];
+
+  if (s1 = '') OR (s2 = '') then
+  begin
+    Result := CompareStr(s1, s2);
+    Exit;
+  end;
+
+  //get leading digits of each string
+  //returns empty string if no leading digits
+  d1 := GetFirstDigits(s1);
+  d2 := GetFirstDigits(s2);
+
+  if (d1 = '') OR (d2 = '') OR (d1 = d2) then
+  begin
+    Result := CompareStr(s1, s2);
+    Exit;
+  end;
+
+  try
+    Result := StrToInt(d1) - StrToInt(d2);
+  except
+    Result := 0;
+  end;
+end;
+
+function GetFileList(const path, extentions: String;
+   var filenames: TStringList): Boolean;
+var
+  SearchRec: TSearchRec;
+  ext_list: TStringList;
+begin
+  Result := False;
+  if (filenames = nil) then
+    Exit;
+
+  ext_list := TStringList.Create;
+
+  try
+
+    ext_list.CaseSensitive := False;
+
+    //extentions should be like .ext1;.ext2;.ext3...
+    ext_list.Delimiter := ';';
+    ext_list.DelimitedText := extentions;
+
+    if FindFirst(path + '\*.*', faAnyFile, SearchRec) = 0 then
+    begin
+      repeat
+
+        if (SearchRec.Attr = faDirectory) or
+           (SearchRec.Name = '.') or
+           (SearchRec.Name = '..') then continue;
+
+        if ext_list.IndexOf(ExtractFileExt(SearchRec.Name)) >= 0 then
+          filenames.Add(SearchRec.Name);
+
+      until FindNext(SearchRec)<>0;
+
+      SysUtils.FindClose(SearchRec);
+      Result := True;
+    end else // if FindFirst <> 0...
+      Result := False;
+      
+  finally
+    ext_list.Free;
+  end;
+end;
+
+function GetNextFile(const filename, extentions: String): String;
+var
+  filenames: TStringList;
+  path: String;
+  i: Integer;
+begin
+  Result := '';
+  filenames := TStringList.Create;
+  try
+
+    path := ExtractFilePath(filename);
+
+    if GetFileList(path, extentions, filenames) then
+    begin
+      //sort files
+      filenames.CustomSort(CompareStringsRespectToFirstDigits);
+      
+      i := filenames.IndexOf(ExtractFileName(filename));
+      if (i < filenames.Count - 1) AND (i >= 0) then
+      begin
+        Result := path + filenames[i + 1];
+      end;
+    end;
+
+  finally
+    filenames.Free;
+  end;
+end;
 
 function ConvertDSTimeUnitsToText(pos: Int64): String;
 var
@@ -363,5 +482,19 @@ begin
     List[Index] := Item;
   end;
 end;
+
+{
+//improvised unit tests
+var
+  t: String;
+
+initialization
+begin
+  t := GetNextFile('D:\video\serials\Avatar The Last Airbender The book 1.Water\7.Мир Духов Зимнее Солнцестояние, Часть 1 (The Spirit World Winter Solstice, Part 1).mkv', '.avi;.mkv');
+  MessageBox(0, PChar(t), '', 0);
+  t := GetNextFile('D:\video\serials\dexter.s06\Dexter.s06.HDTVRip.rus.eng.novafilm\dexter.s06e02.hdtv.rus.eng.novafilm.tv.avi', '.avi;.mkv');
+  MessageBox(0, PChar(t), '', 0);
+end;
+}
 
 end.
