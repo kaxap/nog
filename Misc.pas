@@ -43,7 +43,7 @@ interface
 
 implementation
 
-uses Constants, Math;
+uses Constants;
 
 function GetFirstDigits(const s: String): String;
 var
