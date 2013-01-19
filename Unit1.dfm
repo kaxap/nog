@@ -1903,9 +1903,15 @@ object frmMain: TfrmMain
     Top = 16
     object File1: TMenuItem
       Caption = 'File'
+      OnClick = File1Click
       object mnuOpenFile: TMenuItem
         Caption = 'Open'
         OnClick = mnuOpenFileClick
+      end
+      object mnuOpenNext: TMenuItem
+        Caption = 'Open next'
+        ShortCut = 113
+        OnClick = mnuOpenNextClick
       end
       object Opensubtitles1: TMenuItem
         Caption = 'Open &subtitles'

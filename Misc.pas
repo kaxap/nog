@@ -40,10 +40,22 @@ interface
     procedure ExplodeToWordsOnlyLetters(s: String; ss: TStringList);
     function GetMainWindow(wnd: HWND): HWND;
     function ConvertDSTimeUnitsToText(pos: Int64): String;
+    function GetNextFile(const filename, extentions: String): String;
 
 implementation
 
 uses Constants;
+
+function RemoveAsterisks(const s: String): String;
+var
+  i: Integer;
+begin
+  Result := '';
+  for i := 1 to Length(s) do
+  begin
+    if (s[i] <> '*') then Result := Result + s[i];
+  end;
+end;
 
 function GetFirstDigits(const s: String): String;
 var
@@ -110,7 +122,7 @@ begin
 
     //extentions should be like .ext1;.ext2;.ext3...
     ext_list.Delimiter := ';';
-    ext_list.DelimitedText := extentions;
+    ext_list.DelimitedText := RemoveAsterisks(extentions);
 
     if FindFirst(path + '\*.*', faAnyFile, SearchRec) = 0 then
     begin
@@ -490,9 +502,9 @@ var
 
 initialization
 begin
-  t := GetNextFile('D:\video\serials\Avatar The Last Airbender The book 1.Water\7.Мир Духов Зимнее Солнцестояние, Часть 1 (The Spirit World Winter Solstice, Part 1).mkv', '.avi;.mkv');
+  t := GetNextFile('D:\video\serials\Avatar The Last Airbender The book 1.Water\7.Мир Духов Зимнее Солнцестояние, Часть 1 (The Spirit World Winter Solstice, Part 1).mkv', STR_EXTENTIONS);
   MessageBox(0, PChar(t), '', 0);
-  t := GetNextFile('D:\video\serials\dexter.s06\Dexter.s06.HDTVRip.rus.eng.novafilm\dexter.s06e02.hdtv.rus.eng.novafilm.tv.avi', '.avi;.mkv');
+  t := GetNextFile('D:\video\serials\dexter.s06\Dexter.s06.HDTVRip.rus.eng.novafilm\dexter.s06e02.hdtv.rus.eng.novafilm.tv.avi', STR_EXTENTIONS);
   MessageBox(0, PChar(t), '', 0);
 end;
 }

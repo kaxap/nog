@@ -93,6 +93,7 @@ type
     Subtitles1: TMenuItem;
     tmrCheckCommandline: TTimer;
     chromiumMueller: TChromium;
+    mnuOpenNext: TMenuItem;
     procedure mnuOpenFileClick(Sender: TObject);
     procedure mnuExitClick(Sender: TObject);
     procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
@@ -170,6 +171,8 @@ type
     procedure tmrCheckCommandlineTimer(Sender: TObject);
     procedure FormKeyPress(Sender: TObject; var Key: Char);
     procedure DSVideoWindowEx1DblClick(Sender: TObject);
+    procedure mnuOpenNextClick(Sender: TObject);
+    procedure File1Click(Sender: TObject);
   private
     { Private declarations }
     FSubDelay: Integer;
@@ -274,6 +277,9 @@ begin
   end;
 
   Caption := FFormCaption + ' - ' + FPlayListItem^.Filename;
+
+  //refresh dialog's filename
+  OpenDialog1.FileName := filenames[0];
 
   lbFiles.ItemIndex := 0;
   PlayFile(filenames[0]);
@@ -569,6 +575,10 @@ begin
       DELIMITER_ALIAS);
   except
   end;
+
+  //add extention filter to open file dialog
+  OpenDialog1.Filter := Format('All supported files (%s)|%s',
+    [STR_EXTENTIONS, STR_EXTENTIONS]);
 
   {$IFDEF KOSTYL}
   SetHook(Handle, Application.Handle);
@@ -2498,6 +2508,32 @@ begin
     except
     end;
   end;
+end;
+
+procedure TfrmMain.mnuOpenNextClick(Sender: TObject);
+var
+  filenames: TStringList;
+  filename: String;
+begin
+  filename := GetNextFile(OpenDialog1.FileName, STR_EXTENTIONS);
+
+  if (filename <> '') AND (FileExists(filename)) then
+  begin
+    try
+      filenames := TStringList.Create;
+      filenames.Add(filename);
+      OpenFileUI(filenames);
+    finally
+      filenames.Free;
+    end;
+  end else
+    ShowMessage('There is no next file. Sorry.');
+end;
+
+procedure TfrmMain.File1Click(Sender: TObject);
+begin
+  mnuOpenNext.Enabled :=
+    GetNextFile(OpenDialog1.FileName, STR_EXTENTIONS) <> '';
 end;
 
 end.

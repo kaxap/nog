@@ -9,6 +9,7 @@ const
   CYRILLIC_WORD_LETTERS = ['À'..'ß','à'..'ÿ'];
 
   STR_FILTERNAME_DIRECTSOUND = 'DirectSound';
+  STR_EXTENTIONS = '*.AVI;*.mkv;*.mp4;*.MPG;*.MPEG;*.ASF';
 
   DIC_SEPARATOR = '_____';
   DIR_DIC = 'dicts\';
