@@ -9,7 +9,7 @@ uses
   Dialogs, DSPack, DirectShow9, StdCtrls, ActiveX, DSUtil, Menus,
   ExtCtrls, ComCtrls, Buttons, ImgList, Subtitles, ComObj, Misc, cef, ceflib,
   Dictionaries, shellapi, OleServer, SpeechLib_TLB, XPMan, ShellCtrls,
-  Inifiles, jpeg, AppEvnts, Constants, DirectVobSub;
+  Inifiles, jpeg, AppEvnts, Constants, DirectVobSub, EVR9;
 
 type
   PPlayListItem = ^TPlayListItem;
@@ -44,7 +44,6 @@ type
     SoundLevel: TTrackBar;
     Label3: TLabel;
     ImageList2: TImageList;
-    DSVideoWindowEx1: TDSVideoWindowEx2;
     splitFileList: TSplitter;
     pmFiles: TPopupMenu;
     mnuAddFile: TMenuItem;
@@ -84,16 +83,17 @@ type
     command41: TMenuItem;
     txtSubDelay: TEdit;
     Label1: TLabel;
-    txtVideoWindowFocusHolder: TEdit;
     tmrLoading: TTimer;
-    imgLoading: TImage;
-    chromiumPhrase: TChromium;
     chromiumUI: TChromium;
     tmrUpdateUIControls: TTimer;
     Subtitles1: TMenuItem;
     tmrCheckCommandline: TTimer;
-    chromiumMueller: TChromium;
     mnuOpenNext: TMenuItem;
+    DSVideoWindowEx1: TPanel;
+    txtVideoWindowFocusHolder: TEdit;
+    imgLoading: TImage;
+    chromiumPhrase: TChromium;
+    chromiumMueller: TChromium;
     procedure mnuOpenFileClick(Sender: TObject);
     procedure mnuExitClick(Sender: TObject);
     procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
@@ -173,6 +173,7 @@ type
     procedure DSVideoWindowEx1DblClick(Sender: TObject);
     procedure mnuOpenNextClick(Sender: TObject);
     procedure File1Click(Sender: TObject);
+    procedure DSVideoWindowEx1Resize(Sender: TObject);
   private
     { Private declarations }
     FSubDelay: Integer;
@@ -191,6 +192,9 @@ type
     FPrevWindowHeight: Integer;
     FEnchancedFullScreen: Boolean;
     FSubtitlesHidden: Boolean;
+    FDisplayControl: IMFVideoDisplayControl;
+    FEVR: IBaseFilter;
+    FCanUpdateVideoSize: Boolean;
     procedure AddAudioStreamsToMenu(bDisconnectAfterFirst: Boolean = False);
     procedure mnuAudioStreamClick(Sender: TObject);
     procedure CMDialogKey(var Msg: TWMKey); message CM_DIALOGKEY;
@@ -210,6 +214,8 @@ type
     procedure SwitchToStream(const activeStreamName: String;
       bRestartEverything: Boolean = True);
     function GetVobSubFilter: IDirectVobSub;
+    procedure SetupEVR;
+    procedure UpdateVideoSize;
   public
     { Public declarations }
     FOsdChanged : Boolean;
@@ -239,6 +245,7 @@ type
     function ShowSubtitles(const show: Boolean): Boolean;
     function SwitchSubtitlesVisibility: Boolean;
     function OpenFileUI(filenames: TStrings): Boolean;
+    procedure OpenNextFile;
   end;
 
 var
@@ -379,14 +386,14 @@ end;
 procedure TfrmMain.DSVideoWindowEx1ColorKeyChanged(Sender: TObject);
 begin
   //set colorkey for volume control
-  if DSVideoWindowEx1.OverlayVisible then
+  {if DSVideoWindowEx1.OverlayVisible then
   begin
     ImageList2.BkColor := DSVideoWindowEx1.ColorKey;
   end
   else
   begin
     ImageList2.BkColor := DSVideoWindowEx1.Color;
-  end;
+  end;}
 end;
 
 procedure TfrmMain.sbPlayClick(Sender: TObject);
@@ -428,6 +435,7 @@ begin
   FCanOpenFile := True;
   FCommandlineChecked := False;
   FEnchancedFullScreen := False;
+  FCanUpdateVideoSize := True;
 
   FPhraseTranslated := False;
   FBrowser := nil;
@@ -459,11 +467,11 @@ begin
   Imagelist1.GetBitmap(6, sbNext.Glyph);
 
   //define aspect ratio
-  case DSVideoWindowEx1.AspectRatio of
+  {case DSVideoWindowEx1.AspectRatio of
     rmStretched : mnuStretched.Checked := True;
     rmLetterBox : mnuLetterBox.Checked := True;
     rmCrop      : mnuCrop.Checked := True;
-  end;
+  end;}
   
   //add monitors
   cbMonitors.Items.Add('Current Monitor');
@@ -588,7 +596,7 @@ end;
 procedure TfrmMain.sbFullscreenClick(Sender: TObject);
 begin
   //Windows.Beep(4000, 100);
-  try
+  (*try
     if DSVideoWindowEx1.FullScreen then
     begin
       {try
@@ -613,6 +621,7 @@ begin
   end;
 
   sbFullscreen.Down := DSVideoWindowEx1.FullScreen;
+  *)
 end;
 
 procedure TfrmMain.sbColorControlClick(Sender: TObject);
@@ -660,11 +669,11 @@ begin
   end;
 
   // osd changed (sound volume)
-  if FOsdChanged then
+  {if FOsdChanged then
   begin
     DSVideoWindowEx1.ClearBack;
     FOsdChanged := False;
-  end;
+  end;}
   
 end;
 
@@ -672,7 +681,7 @@ procedure TfrmMain.SoundLevelChange(Sender: TObject);
 var
   tmp : TBitmap;
 begin
-  //sound changed = draw/redraw sound level on video window
+  {//sound changed = draw/redraw sound level on video window
   tmp := TBitmap.Create;
   Imagelist2.GetBitmap(0, tmp);
   FilterGraph1.Volume := SoundLevel.Position;
@@ -703,7 +712,7 @@ begin
   tmp.Free;
 
   //set osd changed flag
-  FOsdChanged := True;
+  FOsdChanged := True;}
 end;
 
 procedure TfrmMain.CheckColorControlSupport;
@@ -803,6 +812,9 @@ var
   bFound: Boolean;
   i: Integer;
   dur: Int64;
+  NR: TNormalizedRect;
+  R: TRect;
+  hr: HRESULT;
 begin
   FilterGraph1.ClearGraph;
 
@@ -814,10 +826,13 @@ begin
   FilterGraph1.Active := True;
   // --------------------------------------------------------------------------------------
 
+  SetupEVR();
+
   FilterGraph1.RenderFile(FileName);
   SoundLevel.Position := FilterGraph1.Volume;
   AddAudioStreamsToMenu(true);
   FilterGraph1.Play;
+
   FIMediaSeek := nil;
   FIMediaSeek := (FilterGraph1 as IMediaSeeking);
 
@@ -930,23 +945,23 @@ end;
 
 procedure TfrmMain.mnuStretchedClick(Sender: TObject);
 begin
-  DSVideoWindowEx1.AspectRatio := rmStretched;
+  {DSVideoWindowEx1.AspectRatio := rmStretched;}
 end;
 
 procedure TfrmMain.mnuLetterBoxClick(Sender: TObject);
 begin
-  DSVideoWindowEx1.AspectRatio := rmLetterBox;
+  {DSVideoWindowEx1.AspectRatio := rmLetterBox;}
 end;
 
 procedure TfrmMain.mnuCropClick(Sender: TObject);
 begin
-  DSVideoWindowEx1.AspectRatio := rmCrop;
+  {DSVideoWindowEx1.AspectRatio := rmCrop;}
 end;
 
 procedure TfrmMain.sbDesktopViewClick(Sender: TObject);
 begin
   //TODO: remove all code related to desktop playback
-  if not DSVideoWindowEx1.DesktopPlayback then
+ { if not DSVideoWindowEx1.DesktopPlayback then
   begin
     //play on selected monitor
     if cbMonitors.ItemIndex > 0 then
@@ -955,19 +970,19 @@ begin
       DSVideoWindowEx1.StartDesktopPlayback;
   end
   else
-    DSVideoWindowEx1.NormalPlayback;
+    DSVideoWindowEx1.NormalPlayback;}
 end;
 
 procedure TfrmMain.pmVideoControllerPopup(Sender: TObject);
 begin
-  FullScreen1.Checked := DSVideoWindowEx1.FullScreen;
+  {FullScreen1.Checked := DSVideoWindowEx1.FullScreen;}
 end;
 
 procedure TfrmMain.sbNextClick(Sender: TObject);
 var
   Filename : String;
 begin
-  if FPlayingIndex < lbFiles.Items.Count -1 then
+  if FPlayingIndex < lbFiles.Items.Count - 1 then
   begin
     //TODO: refactor all this repeating code into one proc/func
     //get filename and path
@@ -1737,6 +1752,11 @@ begin
         SwitchSubtitlesVisibility();
       end;
 
+    VK_F2:
+      begin
+        OpenNextFile;
+      end;
+
     Ord('0')..Ord('9'): ShowWordTranslationByNum(code - Ord('0'));  //open words by pressing 0-9 keyboard buttons
   else
     Result := False;
@@ -2245,7 +2265,9 @@ end;
 
 procedure TfrmMain.SwitchEnhancedFullScreen;
 begin
-  //Caption := Format('%d,%d:%d,%d', [Monitor.Left, Monitor.Top, Monitor.Width, Monitor.Height]);
+  //stop updating video size
+  FCanUpdateVideoSize := False;
+
   if NOT FEnchancedFullScreen then
   begin
     //enter fullscreen mode by hiding window menu and border
@@ -2295,7 +2317,9 @@ begin
 
     FEnchancedFullScreen := False;
   end;
-  //Caption := Format('%d,%d:%d,%d', [Left, Top, Width, Height]);
+
+  FCanUpdateVideoSize := True;
+  UpdateVideoSize;
 end;
 
 procedure TfrmMain.ManagePlayPause;
@@ -2320,10 +2344,10 @@ procedure TfrmMain.ShowPhraseInBottom;
 //and calls for subtitle parse
 begin
   chromiumPhrase.Align := alBottom;
-  if (DSVideoWindowEx1.FullScreen) then
+  {if (DSVideoWindowEx1.FullScreen) then
     chromiumPhrase.Width := Monitor.Width
   else
-    chromiumPhrase.Width := DSVideoWindowEx1.Width;
+    chromiumPhrase.Width := DSVideoWindowEx1.Width;}
 
   chromiumPhrase.Visible := True;
   ParsePhraseToBottom();
@@ -2380,6 +2404,8 @@ begin
     FilterGraph1.ClearGraph;
     FilterGraph1.Active := False;
     FilterGraph1.Active := True;
+
+    SetupEVR();
 
     //get filename and path
     Filename := FPlayListItem^.Path;
@@ -2511,6 +2537,18 @@ begin
 end;
 
 procedure TfrmMain.mnuOpenNextClick(Sender: TObject);
+begin
+  OpenNextFile;
+end;
+
+procedure TfrmMain.File1Click(Sender: TObject);
+begin
+  //check availability of next file
+  mnuOpenNext.Enabled :=
+    GetNextFile(OpenDialog1.FileName, STR_EXTENTIONS) <> '';
+end;
+
+procedure TfrmMain.OpenNextFile;
 var
   filenames: TStringList;
   filename: String;
@@ -2530,10 +2568,44 @@ begin
     ShowMessage('There is no next file. Sorry.');
 end;
 
-procedure TfrmMain.File1Click(Sender: TObject);
+procedure TfrmMain.UpdateVideoSize;
+var
+  NR: TNormalizedRect;
+  R: TRect;
 begin
-  mnuOpenNext.Enabled :=
-    GetNextFile(OpenDialog1.FileName, STR_EXTENTIONS) <> '';
+  if NOT FCanUpdateVideoSize then
+    Exit;
+    
+  NR.Left := 0;
+  NR.Top := 0;
+  NR.Right := 1;
+  NR.Bottom := 1;
+  R := DSVideoWindowEx1.ClientRect;
+
+  if Assigned(FDisplayControl) then
+    FDisplayControl.SetVideoPosition(@nr, @r);
+end;
+
+procedure TfrmMain.DSVideoWindowEx1Resize(Sender: TObject);
+begin
+  UpdateVideoSize;
+end;
+
+procedure TfrmMain.SetupEVR;
+begin
+  if not Succeeded(CoCreateInstance(CLSID_EnhancedVideoRenderer, nil, CLSCTX_INPROC, IID_IBaseFilter, FEVR)) then
+  begin
+    MessageDlg('Could not create the Enhanced video renderer. Please check .NET Framework 3.0 or later is installed.', mtError, [mbOk], -1);
+    Exit;
+  end;
+
+  (FilterGraph1 as IFilterGraph).AddFilter(FEVR, PWideChar(WideString('EVR')));
+  (FEVR as IMFGetService).GetService(MR_VIDEO_RENDER_SERVICE, IID_IMFVideoDisplayControl, FDisplayControl);
+  FDisplayControl.SetAspectRatioMode(MFVideoARMode_None);
+  FDisplayControl.SetVideoWindow(DSVideoWindowEx1.Handle);
+
+  UpdateVideoSize;
+  FDisplayControl.SetAspectRatioMode(MFVideoARMode_PreservePicture);
 end;
 
 end.

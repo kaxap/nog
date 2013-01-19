@@ -19,7 +19,8 @@ uses
   IntegerList in 'IntegerList.pas',
   SubtitlesAnalyzer in 'SubtitlesAnalyzer.pas',
   uMsgReceiver in 'uMsgReceiver.pas' {frmMsgReceiver},
-  uStartup in 'uStartup.pas';
+  uStartup in 'uStartup.pas',
+  EVR9 in 'EVR9.pas';
 
 {$R *.res}
 

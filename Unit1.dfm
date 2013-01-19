@@ -260,33 +260,83 @@ object frmMain: TfrmMain
       OnTimer = DSTrackBar1Timer
     end
   end
-  object DSVideoWindowEx1: TDSVideoWindowEx2
+  object pnlFiles: TPanel
+    Left = 787
+    Top = 0
+    Width = 80
+    Height = 352
+    Align = alRight
+    BevelOuter = bvNone
+    TabOrder = 3
+    object lbFiles: TListBox
+      Left = 0
+      Top = 0
+      Width = 80
+      Height = 352
+      Align = alClient
+      BorderStyle = bsNone
+      Color = clBlack
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clLime
+      Font.Height = -11
+      Font.Name = 'MS Sans Serif'
+      Font.Style = []
+      ItemHeight = 13
+      ParentFont = False
+      PopupMenu = pmFiles
+      TabOrder = 0
+      OnDblClick = lbFilesDblClick
+    end
+  end
+  object Button1: TButton
+    Left = -120
+    Top = 208
+    Width = 75
+    Height = 25
+    Caption = 'Button1'
+    TabOrder = 0
+  end
+  object StatusBar1: TStatusBar
+    Left = 0
+    Top = 516
+    Width = 867
+    Height = 19
+    Panels = <
+      item
+        Width = 75
+      end
+      item
+        Width = 50
+      end>
+    Visible = False
+  end
+  object chromiumUI: TChromium
+    Left = 0
+    Top = 352
+    Width = 867
+    Height = 86
+    Align = alBottom
+    TabOrder = 5
+    OnAfterCreated = chromiumUIAfterCreated
+    OnConsoleMessage = chromiumMuellerConsoleMessage
+    OnKeyEvent = chromiumMuellerKeyEvent
+    OnJsAlert = chromiumMuellerJsAlert
+  end
+  object DSVideoWindowEx1: TPanel
     Left = 0
     Top = 0
     Width = 780
     Height = 352
-    Cursor = crHandPoint
-    AspectRatio = rmLetterBox
-    AutoHideCursor = 3000
-    DigitalZoom = 0
-    FilterGraph = FilterGraph1
-    OnColorKeyChanged = DSVideoWindowEx1ColorKeyChanged
-    ColorControl.Brightness = 750
-    ColorControl.Contrast = 10000
-    ColorControl.Hue = 0
-    ColorControl.Saturation = 10000
-    ColorControl.Sharpness = 5
-    ColorControl.Gamma = 1
-    ColorControl.ColorEnable = True
-    NoScreenSaver = True
-    OnOverlayVisible = DSVideoWindowEx1OverlayVisible
-    Color = clBlack
     Align = alClient
-    OnKeyDown = DSVideoWindowEx1KeyDown
+    BevelOuter = bvNone
+    Caption = 'DSVideoWindowEx1'
+    Color = 1118481
+    TabOrder = 6
     OnClick = DSVideoWindowEx1Click
     OnDblClick = DSVideoWindowEx1DblClick
     OnMouseMove = DSVideoWindowEx1MouseMove
     OnMouseUp = DSVideoWindowEx1MouseUp
+    OnResize = DSVideoWindowEx1Resize
     object imgLoading: TImage
       Left = 0
       Top = 0
@@ -1819,68 +1869,6 @@ object frmMain: TfrmMain
       Options = [coWebSecurityDisabled]
     end
   end
-  object pnlFiles: TPanel
-    Left = 787
-    Top = 0
-    Width = 80
-    Height = 352
-    Align = alRight
-    BevelOuter = bvNone
-    TabOrder = 4
-    object lbFiles: TListBox
-      Left = 0
-      Top = 0
-      Width = 80
-      Height = 352
-      Align = alClient
-      BorderStyle = bsNone
-      Color = clBlack
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clLime
-      Font.Height = -11
-      Font.Name = 'MS Sans Serif'
-      Font.Style = []
-      ItemHeight = 13
-      ParentFont = False
-      PopupMenu = pmFiles
-      TabOrder = 0
-      OnDblClick = lbFilesDblClick
-    end
-  end
-  object Button1: TButton
-    Left = -120
-    Top = 208
-    Width = 75
-    Height = 25
-    Caption = 'Button1'
-    TabOrder = 0
-  end
-  object StatusBar1: TStatusBar
-    Left = 0
-    Top = 516
-    Width = 867
-    Height = 19
-    Panels = <
-      item
-        Width = 75
-      end
-      item
-        Width = 50
-      end>
-    Visible = False
-  end
-  object chromiumUI: TChromium
-    Left = 0
-    Top = 352
-    Width = 867
-    Height = 86
-    Align = alBottom
-    TabOrder = 6
-    OnAfterCreated = chromiumUIAfterCreated
-    OnConsoleMessage = chromiumMuellerConsoleMessage
-    OnKeyEvent = chromiumMuellerKeyEvent
-    OnJsAlert = chromiumMuellerJsAlert
-  end
   object FilterGraph1: TFilterGraph
     GraphEdit = True
     LinearVolume = True
@@ -1909,8 +1897,7 @@ object frmMain: TfrmMain
         OnClick = mnuOpenFileClick
       end
       object mnuOpenNext: TMenuItem
-        Caption = 'Open next'
-        ShortCut = 113
+        Caption = 'Open next    (F2)'
         OnClick = mnuOpenNextClick
       end
       object Opensubtitles1: TMenuItem
