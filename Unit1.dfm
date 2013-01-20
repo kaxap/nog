@@ -332,9 +332,9 @@ object frmMain: TfrmMain
     Caption = 'DSVideoWindowEx1'
     Color = clBlack
     TabOrder = 6
-    OnClick = DSVideoWindowEx1Click
     OnDblClick = DSVideoWindowEx1DblClick
     OnExit = DSVideoWindowEx1Exit
+    OnMouseDown = DSVideoWindowEx1MouseDown
     OnMouseMove = DSVideoWindowEx1MouseMove
     OnMouseUp = DSVideoWindowEx1MouseUp
     OnResize = DSVideoWindowEx1Resize
@@ -3818,5 +3818,11 @@ object frmMain: TfrmMain
     OnTimer = tmrHideCursorTimer
     Left = 312
     Top = 64
+  end
+  object tmrWindowActive: TTimer
+    Interval = 50
+    OnTimer = tmrWindowActiveTimer
+    Left = 344
+    Top = 16
   end
 end

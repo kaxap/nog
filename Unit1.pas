@@ -95,6 +95,7 @@ type
     chromiumPhrase: TChromium;
     chromiumMueller: TChromium;
     tmrHideCursor: TTimer;
+    tmrWindowActive: TTimer;
     procedure mnuOpenFileClick(Sender: TObject);
     procedure mnuExitClick(Sender: TObject);
     procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
@@ -145,7 +146,6 @@ type
       const browser: ICefBrowser; message, source: ustring; line: Integer;
       out Result: Boolean);
     procedure Opensubtitles1Click(Sender: TObject);
-    procedure DSVideoWindowEx1Click(Sender: TObject);
     procedure DSVideoWindowEx1MouseUp(Sender: TObject;
       Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
     procedure command41Click(Sender: TObject);
@@ -177,6 +177,9 @@ type
     procedure DSVideoWindowEx1Resize(Sender: TObject);
     procedure DSVideoWindowEx1Exit(Sender: TObject);
     procedure tmrHideCursorTimer(Sender: TObject);
+    procedure tmrWindowActiveTimer(Sender: TObject);
+    procedure DSVideoWindowEx1MouseDown(Sender: TObject;
+      Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
   private
     { Private declarations }
     FSubDelay: Integer;
@@ -198,6 +201,7 @@ type
     FDisplayControl: IMFVideoDisplayControl;
     FEVR: IBaseFilter;
     FCanUpdateVideoSize: Boolean;
+    FMainWindowActive: Boolean;
     procedure AddAudioStreamsToMenu(bDisconnectAfterFirst: Boolean = False);
     procedure mnuAudioStreamClick(Sender: TObject);
     procedure CMDialogKey(var Msg: TWMKey); message CM_DIALOGKEY;
@@ -1849,11 +1853,6 @@ begin
 
 end;
 
-procedure TfrmMain.DSVideoWindowEx1Click(Sender: TObject);
-begin
-  ManagePlayPause;
-end;
-
 procedure TfrmMain.DSVideoWindowEx1MouseUp(Sender: TObject;
   Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 begin
@@ -2637,6 +2636,18 @@ end;
 procedure TfrmMain.tmrHideCursorTimer(Sender: TObject);
 begin
   HideCursorOnVideo;
+end;
+
+procedure TfrmMain.tmrWindowActiveTimer(Sender: TObject);
+begin
+  FMainWindowActive := GetForegroundWindow = Handle;
+end;
+
+procedure TfrmMain.DSVideoWindowEx1MouseDown(Sender: TObject;
+  Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+begin
+  if FMainWindowActive then
+    ManagePlayPause;
 end;
 
 end.
