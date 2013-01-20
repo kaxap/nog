@@ -2646,11 +2646,8 @@ end;
 procedure TfrmMain.DSVideoWindowEx1MouseDown(Sender: TObject;
   Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 begin
-  if FMainWindowActive then
+  if FMainWindowActive OR (FilterGraph1.State <> gsPlaying) then
     ManagePlayPause
-  else
-    if FilterGraph1.State <> gsPlaying then
-      ManagePlayPause;
 end;
 
 end.
