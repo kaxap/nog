@@ -1903,6 +1903,7 @@ object frmMain: TfrmMain
       Caption = 'View'
       object mnuAspectRatio: TMenuItem
         Caption = 'AspectRatio'
+        Visible = False
         object mnuStretched: TMenuItem
           AutoCheck = True
           Caption = 'Stretched'
