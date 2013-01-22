@@ -2646,6 +2646,10 @@ end;
 procedure TfrmMain.DSVideoWindowEx1MouseDown(Sender: TObject;
   Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 begin
+  //handle left click only
+  if Button <> mbLeft then
+    Exit;
+
   if FMainWindowActive OR (FilterGraph1.State <> gsPlaying) then
     ManagePlayPause
 end;
