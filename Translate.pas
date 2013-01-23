@@ -275,49 +275,49 @@ var
         end;
 
 
-        //первые 16 окончаний в словаре постфиксов - окончания, изменяющие корень слова
+        //first 16 postfixes in postfix dictionary always change stem of a word
         if i < 16 then //s, es, ing, ed, ly, er, est, or etc.
         begin
-          //проверяем на правило "e", то есть добавляем к корню "e" и рекурсивно ищем новое слово
+          //check 'e' rule e.g. add 'e' to stem of a word and search for it recursively
           Result := FindWord(s + 'e'); //like creating-create, lived-live, whiter-white, whitest-white
-          //если нашли, то
+          //if found
           if Result >= 0 then
           begin
-            //уменьшаем глубину рекурсии и выходим
+            //decrease recursion level and exit
             Dec(ARecursionDeepness);
             Exit;
           end;
 
-          //проверка на i в конце корня слова
+          //test for 'i' in the end of a word stem
           if s[Length(s)] = 'i' then
           begin
-            //пробуем заменить i на y
+            //try to substitute 'i' to 'y'
             s[Length(s)] := 'y'; //like copier-copy, earlier-early etc.
-            //рекурсивно ищем новое слово
+            //search for new word recursively
             Result := FindWord(s);
 
-            //если нашли, то
+            //if found
             if Result >= 0 then
             begin
-              //уменьшаем глубину рекурсии и выходим
+              //decrease recursion level and exit
               Dec(ARecursionDeepness);
               Exit;
             end;
 
           end;
 
-          //проверка на v в конце корня слова
+          //check for 'v' in the end of a word stem
           if s[Length(s)] = 'v' then
           begin
-            //пробуем заменить v на f
+            //try to substitute 'v' to 'f'
             s[Length(s)] := 'f'; //like yourselves - yourself, elves - elf
-            //рекурсивно ищем новое слово
+            //search for new word recursively
             Result := FindWord(s);
 
-            //если нашли, то
+            //if found
             if Result >= 0 then
             begin
-              //уменьшаем глубину рекурсии и выходим
+              //decrease recursion level and exit
               Dec(ARecursionDeepness);
               Exit;
             end;
@@ -326,27 +326,27 @@ var
 
         end;
 
-        //снова получаем корень из исходного слова
+        //get stem of a word again
         s := Copy(w, 1, Length(w) - Length(FPostDic[i]));
 
-        //проверяем по чистому совпадению, на этот раз только корни
+        //check for clean match, stem only
         Result := FindWord(s, False, True);  //clean matching, like goods-good, playing-play etc.
-        //если нашли, то
+        //if found then
         if Result >= 0 then
         begin
-          //уменьшаем глубину рекурсии и выходим
+          //decrease recursion level and exit
           Dec(ARecursionDeepness);
           Exit;
         end;
 
-        //проверяем на происхождение от существительного
-        //путем добавления к корню окончания "ion"
-        //рекурсивно ищем новое слово
+        //check for noun
+        //add 'ion' to word's stem
+        //search for new word recursively
         Result := FindWord(s + 'ion'); //like creating-creation, destinated-destination
-        //если нашли, то
+        //if found then
         if Result >= 0 then
         begin
-          //уменьшаем глубину рекурсии и выходим
+          //decrease recursion level and exit
           Dec(ARecursionDeepness);
           Exit;
         end;
@@ -355,26 +355,27 @@ var
 
     end;
 
-    //сотрем возможные префиксы, известные программе по словарю префиксов
+    //get rid of possible prefixes using prefix dictionary
     for i := 0 to FPrefDic.Count - 1 do
     begin
-      //сравниваем по словарю
+      //check with dictionary
       if Copy(w, 1, Length(FPrefDic[i])) = FPrefDic[i] then
       begin
-        //если нашли, то получаем корень слова без префикса
+        //get rid of matched prefix
         s := Copy(w, Length(FPrefDic[i]) + 1, Length(w));
 
-        //если слово и префикс разделены знаком "-", то стираем этот знак
+        //if stem and prefix separated by '-'
+        //delete '-'
         if (s <> '') AND (s[1] = '-') then //self-extractor, semi-colon etc.
           s := Copy(s, 2, Length(s));
 
-        //рекурсивно ищем полученное слово
+        //search for new word recursively
         Result := FindWord(s);
 
-        //если нашли, то
+        //if found
         if Result >= 0 then
         begin
-          //уменьшаем глубину рекурсии и выходим
+          //decrease recursion level and exit
           Dec(ARecursionDeepness);
           Exit;
         end;
@@ -382,7 +383,7 @@ var
       end;
     end;
 
-    //перед выходом из процедуры - уменьшаем глубину рекурсии
+    //decrease recursion level before exiting
     Dec(ARecursionDeepness);
 
   end;
@@ -392,29 +393,27 @@ var
   t: String;
 begin
 
-  // инициализируем переменную, которая содержит глубину рекурсии
+  // init recursion level variable
   ARecursionDeepness := 0;
 
-  //ищем слово
+  //search for word
   i := FindWord(w);
 
   begin
     Result := False;
     translation := '';
 
-    //добавляем переводимое слово (зеленым и жирным)
-    //Result := Result + Format('<b>%s</b><BR>', [w]);
-
-    //если перевод найден, то
+    //if translation found then
     if i >= 0 then
     begin
+      //if word is stemmed, add trivia
       if AnsiLowerCase(FMuellerDic[i]) <> AnsiLowerCase(w) then
         translation := translation
            + Format(HTML_MB_WORD_FROM_MASK, [FMuellerDic[i]]);
 
       Inc(i);
 
-      //добавляем в подсказку перевод из словаря
+      //add translation
       while (i < FMuellerDic.Count) AND (FMuellerDic[i] <> DIC_SEPARATOR) do
       begin
         if NOT transformReferenceToLink(FMuellerDic[i], DELIMITER_DIC_REFERENCE1, t) then
@@ -427,7 +426,7 @@ begin
 
       Result := True;
     end else
-      translation := translation + (HTML_CODE_WORD_NOT_FOUND); //если перевод не найден, то добавляем строку "нет совпадений"
+      translation := translation + (HTML_CODE_WORD_NOT_FOUND); //translation not found
   end;    
 end;
 
