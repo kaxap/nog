@@ -103,6 +103,7 @@ end;
 constructor TSubtitlesAnalyzer.Create(subs: TSrtSubtitles;
   freqDict: TWordDictionary);
 begin
+  //init vars with given values 
   FSubtitles := subs;
   FFreqDict := freqDict;
   FSubsWordCount := -1;
@@ -111,11 +112,14 @@ end;
 
 function TSubtitlesAnalyzer.GetExpectedValue: Integer;
 begin
+  //http://en.wikipedia.org/wiki/Expected_value
   Result := FData.ExpectedValue;
 end;
 
 function TSubtitlesAnalyzer.GetHysto(const height,
   width: Integer; skipfirst: Integer): TBitmap;
+
+//generates hystogramm
 
   function limitToByte(a: Integer): Integer;
   begin
@@ -137,11 +141,13 @@ begin
   bm := TBitmap.Create;
   data := TIntegerList.Create;
   try
+    //setup bitmap
     bm.Width := width;
     bm.Height := height;
     bm.Canvas.Brush.Color := $222222;
     bm.Canvas.FillRect(Rect(0,0,width, height));
 
+    //normalize width
     modw := (FData.Count - skipfirst) div width;
     data.Count := width + 1;
 
@@ -158,10 +164,7 @@ begin
       end;
     end;
 
-
-    //data.CollectInfo;
-
-
+    //normalize height
     modh := data.TheBiggest div height;
     if modh = 0 then
       modh := 1;
