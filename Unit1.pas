@@ -2000,7 +2000,8 @@ begin
   Result := False;
   try
     vob := GetVobSubFilter;
-    vob.put_SubtitleTiming(delay, FSubSpeedMul, FSubSpeedDiv);
+    if (nil <> vob) then
+      vob.put_SubtitleTiming(delay, FSubSpeedMul, FSubSpeedDiv);
   finally
     FSubDelay := delay;
     CheckSubs();
