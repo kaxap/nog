@@ -4,7 +4,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StrUtils;
+  Dialogs, StrUtils, StdCtrls, ComCtrls;
 
 const
   WM_EXTRACTIONCOMPLETE = WM_USER + $01;
@@ -12,6 +12,10 @@ const
 
 type
   TfrmMkvExtractor = class(TForm)
+    Label1: TLabel;
+    ProgressBar1: TProgressBar;
+    Button1: TButton;
+    lblProgress: TLabel;
   private
     { Private declarations }
     FMKVFilename: String;
@@ -278,8 +282,25 @@ end;
 { TfrmMkvExtractor }
 
 procedure TfrmMkvExtractor.OnConsoleData(var msg: TMessage);
+const
+  STR_ID_PROGRESS = 'Progress: ';
+  STR_ID_END = '%';
+var
+  data: String;
+  i, j, k: Integer;
 begin
-
+  data := Copy(PChar(msg.lParam), 1, msg.WParam);
+  i := Pos(STR_ID_PROGRESS, data);
+  j := Pos(STR_ID_END, data);
+  if (i > 0) AND (j > 0) then
+  begin
+    i := i + Length(STR_ID_PROGRESS);
+    if TryStrToInt(Copy(data, i, j - i), k) then
+    begin
+      ProgressBar1.Position := k;
+      lblProgress.Caption := data;
+    end;
+  end;
 end;
 
 procedure TfrmMkvExtractor.OnExtractionComplete(var msg: TMessage);
