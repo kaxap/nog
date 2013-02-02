@@ -913,7 +913,26 @@ begin
       //try to extract subtitles from matroska mkv
       if AnsiLowerCase(ExtractFileExt(filename)) = '.mkv' then
       begin
+        //if mkv file contains english subtitles
+        if frmMkvExtractor.SubtitleWorthy(filename) then
+        begin
+          FilterGraph1.Pause;
+          //ask user
+          if MessageBox(Handle, 'No SRT subtitles found. However, there are one or more'#13'English subtitles in the MKV file.'#13'Would you like to extract it?',
+            'MKV Subtitle Extraction', MB_YESNO) = idYes then
+          begin
+            //try to extract
+            subs := frmMkvExtractor.StartExtractionAndGetFilename(filename);
+            if subs = '' then
+            begin
+              MessageBox(Handle, 'Error occured during subtitle extraction', nil,
+                MB_ICONERROR);
+              FilterGraph1.Play;
+            end;
+          end;
 
+
+        end;
       end;
 
 

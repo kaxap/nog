@@ -14,13 +14,15 @@ type
   TfrmMkvExtractor = class(TForm)
   private
     { Private declarations }
+    FMKVFilename: String;
     procedure OnExtractionComplete(var msg: TMessage); message WM_EXTRACTIONCOMPLETE;
     procedure OnConsoleData(var msg: TMessage); message WM_CONSOLEDATA;
-  public
     function ExtractSubtitlesTrack(const filename: String; track_num: Integer;
       window_handle: THandle): String;
     function GetEnglishSubTrackNum(const filename: String): Integer;
+  public
     function SubtitleWorthy(const filename: String): Boolean;
+    function StartExtractionAndGetFilename(const filename: String): String;
   end;
 
 var
@@ -28,6 +30,8 @@ var
   mkvtoolnix_path: String = 'mkvtoolnix\';
 
 implementation
+
+uses Unit1;
 
 
 procedure ExecuteConsoleApp(const CommandLine: String;
@@ -279,13 +283,33 @@ begin
 end;
 
 procedure TfrmMkvExtractor.OnExtractionComplete(var msg: TMessage);
+var
+  filenames: TStringList;
 begin
+  //reopen file after extraction
+  filenames := TStringList.Create;
+  try
+    filenames.Add(FMKVFilename);
+    frmMain.OpenFileUI(filenames)
+  finally
+    filenames.Free;
+    Close;
+  end;
 
 end;
 
 function TfrmMkvExtractor.SubtitleWorthy(const filename: String): Boolean;
 begin
   Result := GetEnglishSubTrackNum(filename) >= 0;
+end;
+
+function TfrmMkvExtractor.StartExtractionAndGetFilename(
+  const filename: String): String;
+begin
+  Show;
+  FMKVFilename := filename;
+  Result := ExtractSubtitlesTrack(filename,
+    GetEnglishSubTrackNum(filename), Handle);
 end;
 
 end.
