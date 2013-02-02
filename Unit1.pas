@@ -265,7 +265,7 @@ var
 implementation
 
 uses ColorControl, JS_HTML_Code, CefExtension_Translate,
-  Translate, StrUtils;
+  Translate, StrUtils, uMkvExtractor;
 
 {$R *.dfm}
 
@@ -494,6 +494,9 @@ begin
 
   //get root path
   sRootDir := ExtractFilePath(Application.ExeName);
+
+  //get mkvtoolnix path
+  uMkvExtractor.mkvtoolnix_path := sRootDir + uMkvExtractor.mkvtoolnix_path;
 
   //init global vars
   FSubtitles := nil;
