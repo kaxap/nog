@@ -133,6 +133,7 @@ begin
   errors := TStringList.Create;
 
   try
+    //get info from mkv file
     ExecuteConsoleApp(mkvtoolnix_path + 'mkvmerge.exe -I "' + filename + '"',
       output, errors);
 
@@ -141,13 +142,19 @@ begin
 
     for i := 0 to output.Count - 1 do
     begin
+      //find english track
       if Pos(STR_ID_ENG, output[i]) > 0 then
       begin
+        //get track number position
         j := Pos(STR_ID_TRACK_NUM, output[i]);
+
+        //if this track is a subtitle track
         if (j > 0) AND (Pos(STR_ID_SUBTITLES, output[i]) > 0) then
         begin
           //move to last char of STR_ID_TRACK_NUM
           j := j + Length(STR_ID_TRACK_NUM);
+
+          //extract number
           k := PosEx(STR_ID_TRACK_NUM_END, output[i], j);
           if k > 0 then
           begin
@@ -167,6 +174,7 @@ end;
 function TfrmMkvExtractor.ExtractSubtitlesTrack(const filename: String; track_num: Integer;
   window_handle: THandle): String;
 
+//type for thread params  
 type
   TExtractorThreadParams = record
     tracknum: Integer;
@@ -201,10 +209,13 @@ type
 
       command := Format('%smkvextract.exe tracks "%s" -c cp1251 %d:"%s"',
         [mkvtoolnix_path, filename, tracknum, subtitle_filename]);
+
+      //start extraction with reportings (WM_COPYDATA)
       ExecuteConsoleApp(command, output, errors, WindowHandle);
 
       if errors.Count = 0 then
       begin
+        //send message at the end
         SendMessage(WindowHandle, WM_EXTRACTIONCOMPLETE, 0, 0);
       end;
     finally
@@ -223,17 +234,22 @@ begin
   Result := '';
   if (track_num < 0) then
     Exit;
-    
+
+  //name for subtitle file. Just change extension to SRT  
   subtitle_filename := ChangeFileExt(filename, '.SRT');
 
+  //params for thread
   extraction_params.filename := filename;
   extraction_params.subtitle_filename := subtitle_filename;
   extraction_params.tracknum := track_num;
   extraction_params.WindowHandle := window_handle;
+
+  //create event for thread
   extraction_params.EventHandle := CreateEvent(nil, True, False, 'extraction params read event');
 
   if (extraction_params.EventHandle <> 0) then
   begin
+    //start thread
     hThread := CreateThread(nil, 0, @ExtractThread, @extraction_params, 0, thread_id);
     if (hThread = 0) then
     begin
