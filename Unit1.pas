@@ -241,6 +241,7 @@ type
     FIMediaSeek: IMediaSeeking;
     FUIBrowserLoaded: Boolean;
     FTemp: Boolean;
+    FSkipNextMKVSubtitleCheck: Boolean;
     procedure SeekBack();
     procedure SeekForward();
     procedure ChangePosition(diff: Int64);
@@ -910,31 +911,38 @@ begin
     end
     else
     begin
-      //try to extract subtitles from matroska mkv
-      if AnsiLowerCase(ExtractFileExt(filename)) = '.mkv' then
+
+      if NOT FSkipNextMKVSubtitleCheck then
       begin
-        //if mkv file contains english subtitles
-        if frmMkvExtractor.SubtitleWorthy(filename) then
+
+        //try to extract subtitles from matroska mkv
+        if AnsiLowerCase(ExtractFileExt(filename)) = '.mkv' then
         begin
-          FilterGraph1.Pause;
-          //ask user
-          if MessageBox(Handle, 'No SRT subtitles found. However, there are one or more'#13'English subtitles in the MKV file.'#13'Would you like to extract it?',
-            'MKV Subtitle Extraction', MB_YESNO) = idYes then
+          //if mkv file contains english subtitles
+          if frmMkvExtractor.SubtitleWorthy(filename) then
           begin
-            //try to extract
-            subs := frmMkvExtractor.StartExtractionAndGetFilename(filename);
-            if subs = '' then
+            FilterGraph1.Pause;
+            //ask user
+            if MessageBox(Handle, 'No SRT subtitles found. However, there are one or more'#13'English subtitles in the MKV file.'#13'Would you like to extract it?',
+              'MKV Subtitle Extraction', MB_YESNO) = idYes then
             begin
-              MessageBox(Handle, 'Error occured during subtitle extraction', nil,
-                MB_ICONERROR);
-              FilterGraph1.Play;
+              //try to extract
+              subs := frmMkvExtractor.StartExtractionAndGetFilename(filename);
+              if subs = '' then
+              begin
+                MessageBox(Handle, 'Error occured during subtitle extraction', nil,
+                  MB_ICONERROR);
+                FilterGraph1.Play;
+              end;
             end;
+
           end;
-
-
         end;
-      end;
 
+      end else // if FSkipNextMKVSubtitleCheck
+      begin
+        FSkipNextMKVSubtitleCheck := False;
+      end;
 
       FSubtitles.Clear;
       chromiumMueller.Visible := False;

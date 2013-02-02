@@ -14,16 +14,20 @@ type
   TfrmMkvExtractor = class(TForm)
     Label1: TLabel;
     ProgressBar1: TProgressBar;
-    Button1: TButton;
+    btnCancel: TButton;
     lblProgress: TLabel;
+    procedure btnCancelClick(Sender: TObject);
   private
     { Private declarations }
     FMKVFilename: String;
+    FSubtitleFilename: String;
+    FStopEverything: Boolean;
     procedure OnExtractionComplete(var msg: TMessage); message WM_EXTRACTIONCOMPLETE;
     procedure OnConsoleData(var msg: TMessage); message WM_CONSOLEDATA;
     function ExtractSubtitlesTrack(const filename: String; track_num: Integer;
       window_handle: THandle): String;
     function GetEnglishSubTrackNum(const filename: String): Integer;
+    procedure OpenVideo;
   public
     function SubtitleWorthy(const filename: String): Boolean;
     function StartExtractionAndGetFilename(const filename: String): String;
@@ -96,7 +100,15 @@ begin
         break;
       Stream.Write(szBuffer, dwNumberOfBytesRead);
       if (CallBackWindowHandle <> 0) then
-        SendMessage(CallBackWindowHandle, WM_CONSOLEDATA, dwNumberOfBytesRead, lParam(@szBuffer[0]));
+      begin
+        if SendMessage(CallBackWindowHandle, WM_CONSOLEDATA,
+          dwNumberOfBytesRead, lParam(@szBuffer[0])) <> 0 then
+        begin
+          //stop everything
+          TerminateProcess(pi.hProcess, 0);
+        end;
+      end;
+
     end;
     Stream.Position := 0;
     Output.LoadFromStream(Stream);
@@ -247,6 +259,11 @@ begin
   //name for subtitle file. Just change extension to SRT  
   subtitle_filename := ChangeFileExt(filename, '.SRT');
 
+  //save it to global var
+  //in case if user will interrupt the extraction process
+  //we should erase the file
+  FSubtitleFilename := subtitle_filename;
+
   //params for thread
   extraction_params.filename := filename;
   extraction_params.subtitle_filename := subtitle_filename;
@@ -289,6 +306,12 @@ var
   data: String;
   i, j, k: Integer;
 begin
+  //check for interrupt
+  if FStopEverything then
+    msg.Result := -1
+  else
+    msg.Result := 0;  
+
   data := Copy(PChar(msg.lParam), 1, msg.WParam);
   i := Pos(STR_ID_PROGRESS, data);
   j := Pos(STR_ID_END, data);
@@ -298,12 +321,61 @@ begin
     if TryStrToInt(Copy(data, i, j - i), k) then
     begin
       ProgressBar1.Position := k;
-      lblProgress.Caption := data;
+      lblProgress.Caption := Format('%.2d%% complete', [k]) ;
     end;
   end;
 end;
 
 procedure TfrmMkvExtractor.OnExtractionComplete(var msg: TMessage);
+begin
+  if NOT FStopEverything then
+  begin
+    OpenVideo;
+    Close;
+  end;  
+end;
+
+function TfrmMkvExtractor.SubtitleWorthy(const filename: String): Boolean;
+begin
+  FStopEverything := False;
+  Result := GetEnglishSubTrackNum(filename) >= 0;
+end;
+
+function TfrmMkvExtractor.StartExtractionAndGetFilename(
+  const filename: String): String;
+begin
+  FStopEverything := False;
+  Show;
+  FMKVFilename := filename;
+  Result := ExtractSubtitlesTrack(filename,
+    GetEnglishSubTrackNum(filename), Handle);
+end;
+
+procedure TfrmMkvExtractor.btnCancelClick(Sender: TObject);
+var
+  i: Integer;
+begin
+  frmMain.FSkipNextMKVSubtitleCheck := True;
+  FStopEverything := True;
+
+  i := 0;
+  //TODO: fix this unreliable code
+  while FileExists(FSubtitleFilename) do
+  begin
+    Application.ProcessMessages;
+    DeleteFile(FSubtitleFilename);
+    //wait some time while extraction process stops
+    Sleep(100);
+    Inc(i);
+    if (i > 100) then
+      Break;
+  end;
+
+  OpenVideo;
+  Close;
+end;
+
+procedure TfrmMkvExtractor.OpenVideo;
 var
   filenames: TStringList;
 begin
@@ -311,26 +383,10 @@ begin
   filenames := TStringList.Create;
   try
     filenames.Add(FMKVFilename);
-    frmMain.OpenFileUI(filenames)
+    frmMain.OpenFileUI(filenames);
   finally
     filenames.Free;
-    Close;
-  end;
-
-end;
-
-function TfrmMkvExtractor.SubtitleWorthy(const filename: String): Boolean;
-begin
-  Result := GetEnglishSubTrackNum(filename) >= 0;
-end;
-
-function TfrmMkvExtractor.StartExtractionAndGetFilename(
-  const filename: String): String;
-begin
-  Show;
-  FMKVFilename := filename;
-  Result := ExtractSubtitlesTrack(filename,
-    GetEnglishSubTrackNum(filename), Handle);
+  end;  
 end;
 
 end.

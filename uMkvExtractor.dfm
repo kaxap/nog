@@ -36,12 +36,13 @@ object frmMkvExtractor: TfrmMkvExtractor
     Height = 25
     TabOrder = 0
   end
-  object Button1: TButton
+  object btnCancel: TButton
     Left = 280
     Top = 88
     Width = 75
     Height = 25
     Caption = 'Cancel'
     TabOrder = 1
+    OnClick = btnCancelClick
   end
 end
