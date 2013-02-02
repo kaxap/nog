@@ -2660,7 +2660,7 @@ end;
 
 procedure TfrmMain.DSVideoWindowEx1Exit(Sender: TObject);
 begin
-  tmrHideCursor.Enabled := False;
+  //tmrHideCursor.Enabled := False;
 end;
 
 procedure TfrmMain.HideCursorOnVideo;
