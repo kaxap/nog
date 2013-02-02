@@ -20,7 +20,8 @@ uses
   SubtitlesAnalyzer in 'SubtitlesAnalyzer.pas',
   uMsgReceiver in 'uMsgReceiver.pas' {frmMsgReceiver},
   uStartup in 'uStartup.pas',
-  EVR9 in 'EVR9.pas';
+  EVR9 in 'EVR9.pas',
+  uMkvExtractor in 'uMkvExtractor.pas' {frmMkvExtractor};
 
 {$R *.res}
 
@@ -33,5 +34,6 @@ begin
   Application.CreateForm(TfrmMain, frmMain);
   Application.CreateForm(TColorControlForm, ColorControlForm);
   Application.CreateForm(TfrmMsgReceiver, frmMsgReceiver);
+  Application.CreateForm(TfrmMkvExtractor, frmMkvExtractor);
   Application.Run;
 end.

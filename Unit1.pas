@@ -907,6 +907,13 @@ begin
     end
     else
     begin
+      //try to extract subtitles from matroska mkv
+      if AnsiLowerCase(ExtractFileExt(filename)) = '.mkv' then
+      begin
+
+      end;
+
+
       FSubtitles.Clear;
       chromiumMueller.Visible := False;
     end;
