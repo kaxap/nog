@@ -20,6 +20,7 @@ type
     function ExtractSubtitlesTrack(const filename: String; track_num: Integer;
       window_handle: THandle): String;
     function GetEnglishSubTrackNum(const filename: String): Integer;
+    function SubtitleWorthy(const filename: String): Boolean;
   end;
 
 var
@@ -280,6 +281,11 @@ end;
 procedure TfrmMkvExtractor.OnExtractionComplete(var msg: TMessage);
 begin
 
+end;
+
+function TfrmMkvExtractor.SubtitleWorthy(const filename: String): Boolean;
+begin
+  Result := GetEnglishSubTrackNum(filename) >= 0;
 end;
 
 end.
