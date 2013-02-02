@@ -4,7 +4,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs;
+  Dialogs, StrUtils;
 
 const
   WM_EXTRACTIONCOMPLETE = WM_USER + $01;
@@ -17,7 +17,9 @@ type
     procedure OnExtractionComplete(var msg: TMessage); message WM_EXTRACTIONCOMPLETE;
     procedure OnConsoleData(var msg: TMessage); message WM_CONSOLEDATA;
   public
-    { Public declarations }
+    function ExtractSubtitlesTrack(const filename: String; track_num: Integer;
+      window_handle: THandle): String;
+    function GetEnglishSubTrackNum(const filename: String): Integer;
   end;
 
 var
@@ -115,7 +117,7 @@ begin
   CloseHandle(hPipeErrorsRead);
 end;
 
-function GetEnglishSubTrackNum(const filename: String): Integer;
+function TfrmMkvExtractor.GetEnglishSubTrackNum(const filename: String): Integer;
 const
   STR_ID_ENG = 'language:eng';
   STR_ID_TRACK_NUM = 'Track ID ';
@@ -162,7 +164,7 @@ begin
   end;
 end;
 
-function ExtractSubtitlesTrack(const filename: String; track_num: Integer;
+function TfrmMkvExtractor.ExtractSubtitlesTrack(const filename: String; track_num: Integer;
   window_handle: THandle): String;
 
 type
