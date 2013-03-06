@@ -21,7 +21,8 @@ uses
   uMsgReceiver in 'uMsgReceiver.pas' {frmMsgReceiver},
   uStartup in 'uStartup.pas',
   EVR9 in 'EVR9.pas',
-  uMkvExtractor in 'uMkvExtractor.pas' {frmMkvExtractor};
+  uMkvExtractor in 'uMkvExtractor.pas' {frmMkvExtractor},
+  uAbout in 'uAbout.pas' {frmAbout};
 
 {$R *.res}
 
@@ -35,5 +36,6 @@ begin
   Application.CreateForm(TColorControlForm, ColorControlForm);
   Application.CreateForm(TfrmMsgReceiver, frmMsgReceiver);
   Application.CreateForm(TfrmMkvExtractor, frmMkvExtractor);
+  Application.CreateForm(TfrmAbout, frmAbout);
   Application.Run;
 end.

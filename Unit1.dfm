@@ -1961,6 +1961,10 @@ object frmMain: TfrmMain
         OnClick = command41Click
       end
     end
+    object mnuAbout: TMenuItem
+      Caption = 'About'
+      OnClick = mnuAboutClick
+    end
   end
   object ImageList1: TImageList
     Height = 15

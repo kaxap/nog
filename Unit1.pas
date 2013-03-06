@@ -96,6 +96,7 @@ type
     chromiumMueller: TChromium;
     tmrHideCursor: TTimer;
     tmrWindowActive: TTimer;
+    mnuAbout: TMenuItem;
     procedure mnuOpenFileClick(Sender: TObject);
     procedure mnuExitClick(Sender: TObject);
     procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
@@ -180,6 +181,7 @@ type
     procedure tmrWindowActiveTimer(Sender: TObject);
     procedure DSVideoWindowEx1MouseDown(Sender: TObject;
       Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+    procedure mnuAboutClick(Sender: TObject);
   private
     { Private declarations }
     FSubDelay: Integer;
@@ -266,7 +268,7 @@ var
 implementation
 
 uses ColorControl, JS_HTML_Code, CefExtension_Translate,
-  Translate, StrUtils, uMkvExtractor;
+  Translate, StrUtils, uMkvExtractor, uAbout;
 
 {$R *.dfm}
 
@@ -2692,6 +2694,11 @@ begin
 
   if FMainWindowActive OR (FilterGraph1.State <> gsPlaying) then
     ManagePlayPause
+end;
+
+procedure TfrmMain.mnuAboutClick(Sender: TObject);
+begin
+  frmAbout.ShowModal;
 end;
 
 end.
