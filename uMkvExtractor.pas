@@ -181,7 +181,9 @@ begin
           begin
             s := Copy(output[i], j, k - j);
             if NOT TryStrToInt(s, Result) then
-              Result := -1;
+              Result := -1
+            else
+              Break;
           end;
         end;
       end;
